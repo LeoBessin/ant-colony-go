@@ -1,0 +1,34 @@
+File: antsim.exe
+Build ID: C:\Users\bessi\Code\School\Backend\ant-colony-go\bin\antsim.exe2026-09-21 21:35:48.0405657 +0200 CEST
+Type: cpu
+Time: 2026-09-21 21:35:48 CEST
+Duration: 6.52s, Total samples = 6790ms (104.12%)
+Showing nodes accounting for 5710ms, 84.09% of 6790ms total
+Dropped 62 nodes (cum <= 33.95ms)
+Showing top 25 nodes out of 60
+      flat  flat%   sum%        cum   cum%
+     850ms 12.52% 12.52%     1380ms 20.32%  fmt.(*fmt).fmtInteger
+     610ms  8.98% 21.50%     1530ms 22.53%  runtime.mapaccess2_faststr
+     450ms  6.63% 28.13%     2500ms 36.82%  fmt.(*pp).doPrintf
+     390ms  5.74% 33.87%      390ms  5.74%  internal/runtime/maps.ctrlGroup.matchH2 (inline)
+     330ms  4.86% 38.73%      330ms  4.86%  internal/runtime/maps.memHashAES
+     330ms  4.86% 43.59%      440ms  6.48%  runtime.mallocgcTinySC2
+     310ms  4.57% 48.16%     1900ms 27.98%  fmt.(*pp).printArg
+     260ms  3.83% 51.99%      260ms  3.83%  runtime.memmove
+     210ms  3.09% 55.08%     1590ms 23.42%  fmt.(*pp).fmtInteger
+     200ms  2.95% 58.03%      370ms  5.45%  fmt.(*buffer).write (inline)
+     190ms  2.80% 60.82%     4200ms 61.86%  fmt.Sprintf
+     190ms  2.80% 63.62%      330ms  4.86%  sync.(*Pool).pin
+     160ms  2.36% 65.98%      530ms  7.81%  fmt.(*fmt).pad
+     150ms  2.21% 68.19%      430ms  6.33%  fmt.newPrinter
+     130ms  1.91% 70.10%      380ms  5.60%  sync.(*Pool).Put
+     110ms  1.62% 71.72%      630ms  9.28%  runtime.slicebytetostring
+     110ms  1.62% 73.34%      220ms  3.24%  runtime.tryDeferToSpanScan
+     100ms  1.47% 74.82%      100ms  1.47%  runtime.convT64
+     100ms  1.47% 76.29%      160ms  2.36%  runtime.mapassign_faststr
+     100ms  1.47% 77.76%      100ms  1.47%  runtime.spanClass.sizeclass (inline)
+      90ms  1.33% 79.09%     6210ms 91.46%  antcolony/internal/engine/naive.(*World).decayGrid
+      90ms  1.33% 80.41%     1620ms 23.86%  runtime.mapaccess1_faststr
+      90ms  1.33% 81.74%       90ms  1.33%  runtime.procPin (inline)
+      90ms  1.33% 83.06%       90ms  1.33%  runtime.semawakeup
+      70ms  1.03% 84.09%     4370ms 64.36%  antcolony/internal/engine/naive.key (inline)

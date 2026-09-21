@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "name": "small",
+  "seed": 20260921,
+  "width": 64,
+  "height": 64,
+  "ticks": 200,
+  "ant_count": 120,
+  "nest": { "x": 32, "y": 32 },
+  "walls": [
+    { "x": 14, "y": 18, "w": 2, "h": 28 },
+    { "x": 48, "y": 18, "w": 2, "h": 28 },
+    { "x": 16, "y": 46, "w": 32, "h": 2 }
+  ],
+  "food": [
+    { "at": { "x": 5, "y": 6 }, "amount": 400 },
+    { "at": { "x": 58, "y": 7 }, "amount": 400 },
+    { "at": { "x": 31, "y": 58 }, "amount": 400 }
+  ],
+  "pheromone": {
+    "deposit_food": 60000,
+    "deposit_home": 30000,
+    "evap_num": 97,
+    "evap_den": 100,
+    "diff_num": 12,
+    "diff_den": 100,
+    "max": 1000000
+  },
+  "movement": { "random_num": 12, "random_den": 100 }
+}

@@ -1,0 +1,42 @@
+=== bench machine specification ===
+captured: 2026-09-21T21:24:44+02:00
+
+--- runtime ---
+go version go1.27.1 windows/amd64
+windows
+amd64
+v1
+
+0
+
+--- cpu / cache / memory / os ---
+
+
+Name                      : AMD Ryzen 5 5600X 6-Core Processor             
+NumberOfCores             : 6
+NumberOfLogicalProcessors : 12
+MaxClockSpeed             : 3701
+L2CacheSize               : 3072
+L3CacheSize               : 32768
+
+
+
+
+Purpose    Level InstalledSize MaxCacheSize
+-------    ----- ------------- ------------
+L1 - Cache     3           384          384
+L2 - Cache     4          3072         3072
+L3 - Cache     5         32768        32768
+
+
+
+Manufacturer    Capacity Speed ConfiguredClockSpeed
+------------    -------- ----- --------------------
+Unknown      17179869184  3200                 3200
+Unknown      17179869184  3200                 3200
+
+
+Microsoft Windows NT 10.0.26200.0
+Microsoft Windows 11 Pro
+
+--- power plan (turbo/idle behaviour affects variance) ---

@@ -1,0 +1,27 @@
+bin/
+
+# Timestamped intermediate runs are noise — regenerate them with `make all`.
+bench/results/bench_*.txt
+bench/results/scaling_*.txt
+bench/results/hyperfine_*.json
+bench/results/latest.txt
+
+# Profiles are large and machine-specific; the extracted -top text is the
+# evidence the report actually cites, so that stays.
+bench/profiles/*.pprof
+bench/profiles/*.svg
+
+# Everything else under bench/ and docs/env/ is COMMITTED on purpose:
+#   bench/results/baseline.txt   the v0 "before" column of every comparison
+#   bench/results/benchstat.txt  the statistical comparison
+#   bench/results/hyperfine.md   the whole-binary timings
+#   bench/profiles/*.top.txt     the hot-path evidence
+#   docs/env/*.txt               the bench machine specification (rubric §1)
+# The rubric treats this repo as "pièce à conviction" for the measurements.
+# Ignoring the measurements would defeat the point.
+
+# Supports de cours (PDF) — exclus du depot PUBLIC.
+# Ce sont les documents pedagogiques de l'intervenant (christophe-lecroq.dev).
+# Les rediffuser publiquement releve de son droit d'auteur, pas du notre.
+# Ils restent presents en local ; voir docs/README.md.
+docs/*.pdf

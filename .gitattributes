@@ -1,0 +1,14 @@
+# Normalise les fins de ligne dans le depot.
+* text=auto
+
+# Ces fichiers CASSENT avec des fins de ligne CRLF : bash refuse le shebang et
+# make ne reconnait plus les recettes. Forcer LF, y compris a la copie de
+# travail sous Windows.
+*.sh      text eol=lf
+Makefile  text eol=lf
+
+# Le code et les donnees restent en LF pour que les checksums des fichiers
+# golden ne dependent pas de la plateforme du contributeur.
+*.go      text eol=lf
+*.json    text eol=lf
+*.md      text eol=lf

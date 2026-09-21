@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ant Colony — Benchmark Harness</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<header>
+  <h1>Ant Colony <span class="sub">benchmark harness</span></h1>
+  <div id="env" class="env"></div>
+</header>
+
+<main>
+  <section class="panel controls">
+    <h2>Run</h2>
+
+    <label>Scenario
+      <select id="scenario"></select>
+    </label>
+
+    <label>Engine
+      <select id="engine"></select>
+    </label>
+
+    <div class="row">
+      <label>Seed
+        <input id="seed" type="number" value="20260921" step="1">
+      </label>
+      <label>Ticks
+        <input id="ticks" type="number" value="400" min="1" step="1">
+      </label>
+    </div>
+
+    <div class="row">
+      <label>Ants
+        <input id="ants" type="number" value="400" min="1" step="1">
+      </label>
+      <label>Frame every
+        <input id="interval" type="number" value="2" min="1" step="1">
+      </label>
+    </div>
+
+    <div class="buttons">
+      <button id="start" class="primary">Start</button>
+      <button id="stop">Stop</button>
+    </div>
+
+    <div class="layers">
+      <label class="check"><input type="checkbox" id="showFood" checked> food trail</label>
+      <label class="check"><input type="checkbox" id="showHome" checked> home trail</label>
+    </div>
+
+    <dl id="stats" class="stats">
+      <dt>tick</dt><dd id="s-tick">—</dd>
+      <dt>collected</dt><dd id="s-collected">—</dd>
+      <dt>frames/s</dt><dd id="s-fps">—</dd>
+      <dt>dropped</dt><dd id="s-dropped">—</dd>
+    </dl>
+
+    <p id="runstatus" class="status"></p>
+  </section>
+
+  <section class="panel view">
+    <canvas id="grid" width="640" height="640"></canvas>
+    <p class="legend">
+      <span class="key nest"></span> nest
+      <span class="key wall"></span> wall
+      <span class="key food"></span> food
+      <span class="key ant"></span> ant
+      <span class="key carry"></span> carrying
+    </p>
+  </section>
+
+  <section class="panel bench">
+    <h2>Compare engines</h2>
+    <p class="hint">
+      Runs each engine headlessly, same scenario and seed, and checks they all
+      produce the <strong>same checksum</strong>. A mismatch means the
+      "optimization" changed the simulation and its speed does not count.
+    </p>
+
+    <div class="row">
+      <label>Scenario
+        <select id="benchScenario"></select>
+      </label>
+      <label>Repeat
+        <input id="benchRepeat" type="number" value="3" min="1" max="20" step="1">
+      </label>
+    </div>
+
+    <div id="benchEngines" class="engine-picks"></div>
+
+    <button id="runBench" class="primary">Run comparison</button>
+    <p id="benchStatus" class="status"></p>
+
+    <div class="table-wrap">
+      <table id="benchTable">
+        <thead>
+          <tr>
+            <th>engine</th><th>wall (ms)</th><th>ticks/s</th>
+            <th>speedup</th><th>allocs</th><th>heap (MB)</th><th>checksum</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <p class="warn">
+      These numbers are <strong>indicative only</strong> — this process is also
+      serving HTTP. The audit report must use <code>run_benchmarks.sh</code>
+      (hyperfine + benchstat + pprof).
+    </p>
+  </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
