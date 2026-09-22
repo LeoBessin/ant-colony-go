@@ -35,10 +35,13 @@ func (w *World) chooseMove(a *Ant) intent {
 		trail = w.PheroHome
 	}
 
+	// a.Dir ALREADY holds the reversed heading when the previous tick failed to
+	// move: both failure paths below store (d+4)&7. Reversing a second time
+	// here would restore the original heading, so a boxed-in ant would re-test
+	// the exact same three impassable cells every tick and wedge itself against
+	// the obstacle until a wander roll happened to shake it loose. Trust the
+	// stored heading; the turn-around has already been made.
 	dir := a.Dir
-	if a.Blocked {
-		dir = (dir + 4) & 7 // turn around rather than grind against the wall
-	}
 
 	// EXACTLY TWO PRNG draws per ant per tick, unconditionally.
 	//

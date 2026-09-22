@@ -176,8 +176,23 @@ function hex(n) {
 // rendering
 // ---------------------------------------------------------------------------
 
+// Go's encoding/json marshals []uint8 as a base64 STRING, not as an array.
+// `af`, `pf` and `ph` therefore arrive as text: indexing one yields a character
+// ("A"), which is truthy — so every ant read as "carrying" — and arithmetic on
+// it yields NaN, which a Uint8ClampedArray stores as 0 — so both pheromone
+// layers rendered pure black. Decode once, here, and the rest of draw() sees
+// the byte arrays it was written against.
+function bytes(v) {
+  if (typeof v !== "string") return v || [];
+  const bin = atob(v);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
 function draw(s) {
   const w = s.w, h = s.h;
+  const af = bytes(s.af), pf = bytes(s.pf), ph = bytes(s.ph);
   const px = Math.max(1, Math.floor(canvas.width / Math.max(w, h)));
   const size = px * Math.max(w, h);
   if (canvas.width !== size) { canvas.width = canvas.height = size; }
@@ -194,8 +209,8 @@ function draw(s) {
     const img = ctx.createImageData(w, h);
     const d = img.data;
     for (let i = 0; i < w * h; i++) {
-      const f = showFood ? (s.pf[i] || 0) : 0;
-      const hm = showHome ? (s.ph[i] || 0) : 0;
+      const f = showFood ? (pf[i] || 0) : 0;
+      const hm = showHome ? (ph[i] || 0) : 0;
       const o = i * 4;
       d[o]     = 7 + f * 0.85;
       d[o + 1] = 8 + f * 0.45 + hm * 0.30;
@@ -229,7 +244,7 @@ function draw(s) {
 
   const ap = Math.max(1, px - 1);
   for (let i = 0; i < s.ax.length; i++) {
-    ctx.fillStyle = s.af[i] ? "#ffb347" : "#e6e7ee";
+    ctx.fillStyle = af[i] ? "#ffb347" : "#e6e7ee";
     ctx.fillRect(s.ax[i] * px, s.ay[i] * px, ap, ap);
   }
 }
