@@ -14,8 +14,9 @@
 #   profile   pprof CPU + heap, top + svg            -> bench/profiles/
 #   report    concatenate everything                 -> docs/report/generated-tables.md
 #
-# Written for Git Bash on Windows 11. Missing optional tools (hyperfine,
-# graphviz) produce a warning and a skipped stage, never a failed run.
+# Runs under Git Bash on Windows 11 or a POSIX shell on macOS/Linux; stage_env
+# detects `uname` and picks the matching capture path. Missing optional tools
+# (hyperfine, graphviz) produce a warning and a skipped stage, never a failed run.
 
 set -uo pipefail
 
@@ -42,7 +43,7 @@ ENGINE_RE='^Benchmark(Engine|TickRate|Scaling)'
 MICRO_RE='^Benchmark(Key|GridLookup|Rng)'
 HYPERFINE_RUNS="${HYPERFINE_RUNS:-10}"
 HYPERFINE_WARMUP="${HYPERFINE_WARMUP:-3}"
-CPUS="${CPUS:-1,2,6,12}"                     # Ryzen 5 5600X: 6 physical, 12 logical
+CPUS="${CPUS:-1,2,4,8,12}"                   # Apple M4 Pro: 12 physical cores, no SMT
 
 STAMP="$(date +%Y-%m-%d_%H%M%S)"
 RESULTS="bench/results"
@@ -85,28 +86,58 @@ mkdir -p "$RESULTS" "$PROFILES" "$ENVDIR" bin docs/report
 stage_env() {
   say "environment"
   local out="$ENVDIR/${STAMP}.txt"
+  local iso_date
+  iso_date="$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date)"
   {
     echo "=== bench machine specification ==="
-    echo "captured: $(date --iso-8601=seconds)"
+    echo "captured: $iso_date"
     echo
     echo "--- runtime ---"
     go version
     go env GOOS GOARCH GOAMD64 GOMAXPROCS CGO_ENABLED
     echo
     echo "--- cpu / cache / memory / os ---"
-    powershell -NoProfile -Command '
-      Get-CimInstance Win32_Processor |
-        Format-List Name,NumberOfCores,NumberOfLogicalProcessors,MaxClockSpeed,L2CacheSize,L3CacheSize
-      Get-CimInstance Win32_CacheMemory |
-        Format-Table Purpose,Level,InstalledSize,MaxCacheSize -AutoSize
-      Get-CimInstance Win32_PhysicalMemory |
-        Format-Table Manufacturer,Capacity,Speed,ConfiguredClockSpeed -AutoSize
-      [System.Environment]::OSVersion.VersionString
-      (Get-CimInstance Win32_OperatingSystem).Caption
-    ' 2>/dev/null
+    case "$(uname -s)" in
+      Darwin)
+        sysctl -n machdep.cpu.brand_string 2>/dev/null
+        echo "physical cores: $(sysctl -n hw.physicalcpu 2>/dev/null)"
+        echo "logical cores:  $(sysctl -n hw.logicalcpu 2>/dev/null)"
+        echo "base freq (Hz): $(sysctl -n hw.cpufrequency 2>/dev/null || echo 'n/a (Apple Silicon does not expose this)')"
+        echo "L1 icache: $(sysctl -n hw.l1icachesize 2>/dev/null) bytes"
+        echo "L1 dcache: $(sysctl -n hw.l1dcachesize 2>/dev/null) bytes"
+        echo "L2 cache:  $(sysctl -n hw.l2cachesize 2>/dev/null) bytes"
+        echo "L3 cache:  $(sysctl -n hw.l3cachesize 2>/dev/null || echo 'n/a (not exposed on this model)')"
+        echo "memory:    $(sysctl -n hw.memsize 2>/dev/null) bytes"
+        echo
+        sw_vers 2>/dev/null
+        ;;
+      Linux)
+        lscpu 2>/dev/null
+        echo
+        grep -E '^(MemTotal|MemFree)' /proc/meminfo 2>/dev/null
+        echo
+        cat /etc/os-release 2>/dev/null
+        ;;
+      *)
+        powershell -NoProfile -Command '
+          Get-CimInstance Win32_Processor |
+            Format-List Name,NumberOfCores,NumberOfLogicalProcessors,MaxClockSpeed,L2CacheSize,L3CacheSize
+          Get-CimInstance Win32_CacheMemory |
+            Format-Table Purpose,Level,InstalledSize,MaxCacheSize -AutoSize
+          Get-CimInstance Win32_PhysicalMemory |
+            Format-Table Manufacturer,Capacity,Speed,ConfiguredClockSpeed -AutoSize
+          [System.Environment]::OSVersion.VersionString
+          (Get-CimInstance Win32_OperatingSystem).Caption
+        ' 2>/dev/null
+        ;;
+    esac
     echo
     echo "--- power plan (turbo/idle behaviour affects variance) ---"
-    powercfg /getactivescheme 2>/dev/null
+    case "$(uname -s)" in
+      Darwin) pmset -g 2>/dev/null | head -20 ;;
+      Linux)  cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor 2>/dev/null ;;
+      *)      powercfg /getactivescheme 2>/dev/null ;;
+    esac
   } > "$out" 2>&1
   ok "$out"
 }

@@ -1,108 +1,108 @@
-goos: windows
-goarch: amd64
+goos: darwin
+goarch: arm64
 pkg: antcolony/bench
-cpu: AMD Ryzen 5 5600X 6-Core Processor             
-BenchmarkEngine/small/naive-12         	       3	 801510567 ns/op	43614834 B/op	 8244004 allocs/op
-BenchmarkEngine/small/naive-12         	       3	 803606600 ns/op	43616408 B/op	 8244007 allocs/op
-BenchmarkEngine/small/naive-12         	       3	 807503200 ns/op	43615530 B/op	 8244005 allocs/op
-BenchmarkEngine/small/naive-12         	       3	 793375867 ns/op	43614802 B/op	 8244002 allocs/op
-BenchmarkEngine/small/naive-12         	       3	 796339633 ns/op	43615069 B/op	 8244005 allocs/op
-BenchmarkEngine/small/naive-12         	       3	 796995767 ns/op	43615869 B/op	 8244003 allocs/op
-BenchmarkEngine/medium/naive-12        	       3	6441228233 ns/op	418505165 B/op	66228921 allocs/op
-BenchmarkEngine/medium/naive-12        	       3	6495687333 ns/op	418509538 B/op	66228943 allocs/op
-BenchmarkEngine/medium/naive-12        	       3	6528955333 ns/op	418504237 B/op	66228920 allocs/op
-BenchmarkEngine/medium/naive-12        	       3	6428932600 ns/op	418504637 B/op	66228913 allocs/op
-BenchmarkEngine/medium/naive-12        	       3	6437395233 ns/op	418504480 B/op	66228916 allocs/op
-BenchmarkEngine/medium/naive-12        	       3	6461434067 ns/op	418505741 B/op	66228913 allocs/op
-BenchmarkTickRate/naive-12             	       3	6715433367 ns/op	        59.56 ticks/s	418508096 B/op	66228945 allocs/op
-BenchmarkTickRate/naive-12             	       3	6461760733 ns/op	        61.90 ticks/s	418505205 B/op	66228924 allocs/op
-BenchmarkTickRate/naive-12             	       3	6578987433 ns/op	        60.80 ticks/s	418506016 B/op	66228924 allocs/op
-BenchmarkTickRate/naive-12             	       3	6513953900 ns/op	        61.41 ticks/s	418505432 B/op	66228923 allocs/op
-BenchmarkTickRate/naive-12             	       3	6490049133 ns/op	        61.63 ticks/s	418509250 B/op	66228939 allocs/op
-BenchmarkTickRate/naive-12             	       3	6424469633 ns/op	        62.26 ticks/s	418504784 B/op	66228922 allocs/op
-BenchmarkScaling/naive-12              	       3	 795482633 ns/op	43615557 B/op	 8244006 allocs/op
-BenchmarkScaling/naive-12              	       3	 829042000 ns/op	43615101 B/op	 8244005 allocs/op
-BenchmarkScaling/naive-12              	       3	 794351133 ns/op	43615053 B/op	 8244005 allocs/op
-BenchmarkScaling/naive-12              	       3	 800538400 ns/op	43615488 B/op	 8244003 allocs/op
-BenchmarkScaling/naive-12              	       3	 804982600 ns/op	43616488 B/op	 8244007 allocs/op
-BenchmarkScaling/naive-12              	       3	 803068367 ns/op	43615309 B/op	 8244008 allocs/op
+cpu: Apple M4 Pro
+BenchmarkEngine/small/naive-12         	       3	 489279139 ns/op	43508170 B/op	 8266331 allocs/op
+BenchmarkEngine/small/naive-12         	       3	 485707028 ns/op	43508664 B/op	 8266331 allocs/op
+BenchmarkEngine/small/naive-12         	       3	 514044847 ns/op	43511629 B/op	 8266339 allocs/op
+BenchmarkEngine/small/naive-12         	       3	 490798833 ns/op	43509096 B/op	 8266335 allocs/op
+BenchmarkEngine/small/naive-12         	       3	 494557153 ns/op	43510029 B/op	 8266334 allocs/op
+BenchmarkEngine/small/naive-12         	       3	 486722125 ns/op	43510050 B/op	 8266333 allocs/op
+BenchmarkEngine/medium/naive-12        	       3	4071022542 ns/op	417140632 B/op	66302067 allocs/op
+BenchmarkEngine/medium/naive-12        	       3	4091742694 ns/op	417140725 B/op	66302073 allocs/op
+BenchmarkEngine/medium/naive-12        	       3	4118164264 ns/op	417143296 B/op	66302087 allocs/op
+BenchmarkEngine/medium/naive-12        	       3	4137298708 ns/op	417214138 B/op	66302083 allocs/op
+BenchmarkEngine/medium/naive-12        	       3	4149655722 ns/op	417197514 B/op	66302086 allocs/op
+BenchmarkEngine/medium/naive-12        	       3	4145305097 ns/op	417122672 B/op	66302064 allocs/op
+BenchmarkTickRate/naive-12             	       3	4192151542 ns/op	        95.42 ticks/s	417197365 B/op	66302095 allocs/op
+BenchmarkTickRate/naive-12             	       3	4164314069 ns/op	        96.05 ticks/s	417126298 B/op	66302088 allocs/op
+BenchmarkTickRate/naive-12             	       3	4262508750 ns/op	        93.84 ticks/s	417144002 B/op	66302098 allocs/op
+BenchmarkTickRate/naive-12             	       3	4157641361 ns/op	        96.21 ticks/s	417141506 B/op	66302074 allocs/op
+BenchmarkTickRate/naive-12             	       3	4166804153 ns/op	        96.00 ticks/s	417195421 B/op	66302081 allocs/op
+BenchmarkTickRate/naive-12             	       3	4148478014 ns/op	        96.42 ticks/s	417142080 B/op	66302075 allocs/op
+BenchmarkScaling/naive-12              	       3	 507606695 ns/op	43510365 B/op	 8266335 allocs/op
+BenchmarkScaling/naive-12              	       3	 506661736 ns/op	43510178 B/op	 8266334 allocs/op
+BenchmarkScaling/naive-12              	       3	 508179486 ns/op	43510605 B/op	 8266339 allocs/op
+BenchmarkScaling/naive-12              	       3	 504581417 ns/op	43510317 B/op	 8266336 allocs/op
+BenchmarkScaling/naive-12              	       3	 504485000 ns/op	43510365 B/op	 8266336 allocs/op
+BenchmarkScaling/naive-12              	       3	 501285542 ns/op	43510146 B/op	 8266334 allocs/op
 PASS
-ok  	antcolony/bench	351.172s
-goos: windows
-goarch: amd64
+ok  	antcolony/bench	223.361s
+goos: darwin
+goarch: arm64
 pkg: antcolony/bench
-cpu: AMD Ryzen 5 5600X 6-Core Processor             
-BenchmarkKeySprintf-12           	50093298	        73.48 ns/op	       6 B/op	       1 allocs/op
-BenchmarkKeySprintf-12           	47408593	        71.05 ns/op	       6 B/op	       1 allocs/op
-BenchmarkKeySprintf-12           	50217469	        70.89 ns/op	       6 B/op	       1 allocs/op
-BenchmarkKeySprintf-12           	50925932	        71.16 ns/op	       6 B/op	       1 allocs/op
-BenchmarkKeySprintf-12           	50532201	        70.86 ns/op	       6 B/op	       1 allocs/op
-BenchmarkKeySprintf-12           	50818172	        71.75 ns/op	       6 B/op	       1 allocs/op
-BenchmarkKeySprintf-12           	50795442	        70.72 ns/op	       6 B/op	       1 allocs/op
-BenchmarkKeySprintf-12           	51018310	        70.90 ns/op	       6 B/op	       1 allocs/op
-BenchmarkKeyStrconv-12           	123641199	        29.28 ns/op	       7 B/op	       1 allocs/op
-BenchmarkKeyStrconv-12           	123341619	        28.99 ns/op	       7 B/op	       1 allocs/op
-BenchmarkKeyStrconv-12           	124673580	        28.98 ns/op	       7 B/op	       1 allocs/op
-BenchmarkKeyStrconv-12           	121111072	        29.26 ns/op	       7 B/op	       1 allocs/op
-BenchmarkKeyStrconv-12           	123820885	        28.95 ns/op	       7 B/op	       1 allocs/op
-BenchmarkKeyStrconv-12           	124481641	        29.06 ns/op	       7 B/op	       1 allocs/op
-BenchmarkKeyStrconv-12           	123690014	        29.10 ns/op	       7 B/op	       1 allocs/op
-BenchmarkKeyStrconv-12           	123543685	        29.36 ns/op	       7 B/op	       1 allocs/op
-BenchmarkKeyFlatIndex-12         	1000000000	         0.4454 ns/op	       0 B/op	       0 allocs/op
-BenchmarkKeyFlatIndex-12         	1000000000	         0.4559 ns/op	       0 B/op	       0 allocs/op
-BenchmarkKeyFlatIndex-12         	1000000000	         0.4453 ns/op	       0 B/op	       0 allocs/op
-BenchmarkKeyFlatIndex-12         	1000000000	         0.4484 ns/op	       0 B/op	       0 allocs/op
-BenchmarkKeyFlatIndex-12         	1000000000	         0.4511 ns/op	       0 B/op	       0 allocs/op
-BenchmarkKeyFlatIndex-12         	1000000000	         0.4521 ns/op	       0 B/op	       0 allocs/op
-BenchmarkKeyFlatIndex-12         	1000000000	         0.4496 ns/op	       0 B/op	       0 allocs/op
-BenchmarkKeyFlatIndex-12         	1000000000	         0.4508 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGridLookupMap-12        	40270437	        88.63 ns/op	       6 B/op	       1 allocs/op
-BenchmarkGridLookupMap-12        	40712421	        88.31 ns/op	       6 B/op	       1 allocs/op
-BenchmarkGridLookupMap-12        	40587388	        88.35 ns/op	       6 B/op	       1 allocs/op
-BenchmarkGridLookupMap-12        	39557700	        88.81 ns/op	       6 B/op	       1 allocs/op
-BenchmarkGridLookupMap-12        	40053670	        87.91 ns/op	       6 B/op	       1 allocs/op
-BenchmarkGridLookupMap-12        	41084540	        88.15 ns/op	       6 B/op	       1 allocs/op
-BenchmarkGridLookupMap-12        	41285775	        88.65 ns/op	       6 B/op	       1 allocs/op
-BenchmarkGridLookupMap-12        	40853474	        88.33 ns/op	       6 B/op	       1 allocs/op
-BenchmarkGridLookupFlat-12       	1000000000	         0.4522 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGridLookupFlat-12       	1000000000	         0.4470 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGridLookupFlat-12       	1000000000	         0.4475 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGridLookupFlat-12       	1000000000	         0.4493 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGridLookupFlat-12       	1000000000	         0.4584 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGridLookupFlat-12       	1000000000	         0.4504 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGridLookupFlat-12       	1000000000	         0.4466 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGridLookupFlat-12       	1000000000	         0.4466 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngXoshiro-12           	1000000000	         1.764 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngXoshiro-12           	1000000000	         1.790 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngXoshiro-12           	1000000000	         1.813 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngXoshiro-12           	1000000000	         1.795 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngXoshiro-12           	1000000000	         1.786 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngXoshiro-12           	1000000000	         1.783 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngXoshiro-12           	1000000000	         1.776 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngXoshiro-12           	1000000000	         1.779 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngXoshiroIntn-12       	1000000000	         2.757 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngXoshiroIntn-12       	1000000000	         2.744 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngXoshiroIntn-12       	1000000000	         2.738 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngXoshiroIntn-12       	1000000000	         2.759 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngXoshiroIntn-12       	1000000000	         2.730 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngXoshiroIntn-12       	1000000000	         2.748 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngXoshiroIntn-12       	1000000000	         2.750 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngXoshiroIntn-12       	1000000000	         2.750 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngMathRandLocal-12     	738344462	         4.803 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngMathRandLocal-12     	738419732	         4.823 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngMathRandLocal-12     	741966358	         4.820 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngMathRandLocal-12     	747180172	         4.813 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngMathRandLocal-12     	730202979	         4.830 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngMathRandLocal-12     	744321447	         4.824 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngMathRandLocal-12     	741864222	         4.846 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngMathRandLocal-12     	744254664	         4.855 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngMathRandGlobal-12    	406594785	         8.848 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngMathRandGlobal-12    	409052142	         8.846 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngMathRandGlobal-12    	409537257	         8.817 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngMathRandGlobal-12    	403673473	         8.829 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngMathRandGlobal-12    	407913891	         8.841 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngMathRandGlobal-12    	404801120	         8.832 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngMathRandGlobal-12    	409472276	         8.909 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRngMathRandGlobal-12    	409676326	         8.829 ns/op	       0 B/op	       0 allocs/op
+cpu: Apple M4 Pro
+BenchmarkKeySprintf-12           	81749509	        43.91 ns/op	       6 B/op	       1 allocs/op
+BenchmarkKeySprintf-12           	81945756	        44.02 ns/op	       6 B/op	       1 allocs/op
+BenchmarkKeySprintf-12           	82138568	        45.46 ns/op	       6 B/op	       1 allocs/op
+BenchmarkKeySprintf-12           	76592077	        45.31 ns/op	       6 B/op	       1 allocs/op
+BenchmarkKeySprintf-12           	77429692	        45.27 ns/op	       6 B/op	       1 allocs/op
+BenchmarkKeySprintf-12           	80417949	        45.71 ns/op	       6 B/op	       1 allocs/op
+BenchmarkKeySprintf-12           	77898332	        45.21 ns/op	       6 B/op	       1 allocs/op
+BenchmarkKeySprintf-12           	80019188	        45.64 ns/op	       6 B/op	       1 allocs/op
+BenchmarkKeyStrconv-12           	173313885	        20.69 ns/op	       7 B/op	       1 allocs/op
+BenchmarkKeyStrconv-12           	167928513	        20.46 ns/op	       7 B/op	       1 allocs/op
+BenchmarkKeyStrconv-12           	175979752	        20.82 ns/op	       7 B/op	       1 allocs/op
+BenchmarkKeyStrconv-12           	175550443	        20.22 ns/op	       7 B/op	       1 allocs/op
+BenchmarkKeyStrconv-12           	174948010	        20.37 ns/op	       7 B/op	       1 allocs/op
+BenchmarkKeyStrconv-12           	175014868	        20.49 ns/op	       7 B/op	       1 allocs/op
+BenchmarkKeyStrconv-12           	176419250	        20.32 ns/op	       7 B/op	       1 allocs/op
+BenchmarkKeyStrconv-12           	176198260	        20.44 ns/op	       7 B/op	       1 allocs/op
+BenchmarkKeyFlatIndex-12         	1000000000	         0.3210 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKeyFlatIndex-12         	1000000000	         0.3161 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKeyFlatIndex-12         	1000000000	         0.3188 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKeyFlatIndex-12         	1000000000	         0.3162 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKeyFlatIndex-12         	1000000000	         0.3127 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKeyFlatIndex-12         	1000000000	         0.3108 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKeyFlatIndex-12         	1000000000	         0.3188 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKeyFlatIndex-12         	1000000000	         0.3154 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGridLookupMap-12        	65776150	        56.00 ns/op	       6 B/op	       1 allocs/op
+BenchmarkGridLookupMap-12        	64681405	        56.19 ns/op	       6 B/op	       1 allocs/op
+BenchmarkGridLookupMap-12        	62840932	        55.99 ns/op	       6 B/op	       1 allocs/op
+BenchmarkGridLookupMap-12        	63586171	        55.96 ns/op	       6 B/op	       1 allocs/op
+BenchmarkGridLookupMap-12        	64040749	        56.60 ns/op	       6 B/op	       1 allocs/op
+BenchmarkGridLookupMap-12        	62351518	        56.58 ns/op	       6 B/op	       1 allocs/op
+BenchmarkGridLookupMap-12        	63748123	        55.75 ns/op	       6 B/op	       1 allocs/op
+BenchmarkGridLookupMap-12        	64822332	        55.54 ns/op	       6 B/op	       1 allocs/op
+BenchmarkGridLookupFlat-12       	1000000000	         0.3238 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGridLookupFlat-12       	1000000000	         0.3231 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGridLookupFlat-12       	1000000000	         0.3252 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGridLookupFlat-12       	1000000000	         0.3285 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGridLookupFlat-12       	1000000000	         0.3323 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGridLookupFlat-12       	1000000000	         0.3270 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGridLookupFlat-12       	1000000000	         0.3226 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGridLookupFlat-12       	1000000000	         0.3228 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngXoshiro-12           	1000000000	         2.703 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngXoshiro-12           	1000000000	         2.682 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngXoshiro-12           	1000000000	         2.677 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngXoshiro-12           	1000000000	         2.692 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngXoshiro-12           	1000000000	         2.702 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngXoshiro-12           	1000000000	         2.695 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngXoshiro-12           	1000000000	         2.693 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngXoshiro-12           	1000000000	         2.739 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngXoshiroIntn-12       	1000000000	         2.885 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngXoshiroIntn-12       	1000000000	         2.886 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngXoshiroIntn-12       	1000000000	         2.890 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngXoshiroIntn-12       	1000000000	         2.899 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngXoshiroIntn-12       	1000000000	         2.888 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngXoshiroIntn-12       	1000000000	         2.887 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngXoshiroIntn-12       	1000000000	         2.895 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngXoshiroIntn-12       	1000000000	         2.900 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngMathRandLocal-12     	1000000000	         2.824 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngMathRandLocal-12     	1000000000	         2.825 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngMathRandLocal-12     	1000000000	         2.831 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngMathRandLocal-12     	1000000000	         2.828 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngMathRandLocal-12     	1000000000	         2.836 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngMathRandLocal-12     	1000000000	         2.829 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngMathRandLocal-12     	1000000000	         2.863 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngMathRandLocal-12     	1000000000	         2.841 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngMathRandGlobal-12    	612699516	         5.840 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngMathRandGlobal-12    	617156611	         5.836 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngMathRandGlobal-12    	617124651	         5.982 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngMathRandGlobal-12    	617183061	         5.914 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngMathRandGlobal-12    	615712556	         5.873 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngMathRandGlobal-12    	614873665	         5.862 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngMathRandGlobal-12    	609704806	         5.854 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRngMathRandGlobal-12    	615896503	         5.866 ns/op	       0 B/op	       0 allocs/op
 PASS
-ok  	antcolony/bench	227.673s
+ok  	antcolony/bench	220.254s

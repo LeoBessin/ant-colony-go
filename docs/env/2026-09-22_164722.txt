@@ -1,0 +1,42 @@
+=== bench machine specification ===
+captured: 2026-09-22T14:47:22Z
+
+--- runtime ---
+go version go1.26.4 darwin/arm64
+darwin
+arm64
+
+
+1
+
+--- cpu / cache / memory / os ---
+Apple M4 Pro
+physical cores: 12
+logical cores:  12
+base freq (Hz): 
+L1 icache: 131072 bytes
+L1 dcache: 65536 bytes
+L2 cache:  4194304 bytes
+L3 cache:  
+memory:    25769803776 bytes
+
+ProductName:		macOS
+ProductVersion:		27.0
+BuildVersion:		26A428
+
+--- power plan (turbo/idle behaviour affects variance) ---
+System-wide power settings:
+Currently in use:
+ standby              1
+ Sleep On Power Button 1
+ hibernatefile        /var/vm/sleepimage
+ powernap             1
+ networkoversleep     0
+ disksleep            10
+ sleep                1 (sleep prevented by powerd, sharingd)
+ hibernatemode        3
+ ttyskeepawake        1
+ displaysleep         2
+ tcpkeepalive         1
+ powermode            0
+ womp                 0

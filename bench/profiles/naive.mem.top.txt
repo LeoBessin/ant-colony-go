@@ -1,20 +1,19 @@
 File: antsim.exe
-Build ID: C:\Users\bessi\Code\School\Backend\ant-colony-go\bin\antsim.exe2026-09-21 21:35:48.0405657 +0200 CEST
 Type: alloc_objects
-Time: 2026-09-21 21:35:55 CEST
-Showing nodes accounting for 26612873, 99.91% of 26636793 total
-Dropped 37 nodes (cum <= 133183)
+Time: 2026-09-22 16:56:52 CEST
+Showing nodes accounting for 25362931, 99.84% of 25402867 total
+Dropped 36 nodes (cum <= 127014)
       flat  flat%   sum%        cum   cum%
-  26612698 99.91% 99.91%   26618949 99.93%  fmt.Sprintf
-       175 0.00066% 99.91%   26324208 98.83%  antcolony/internal/engine/naive.(*World).decayGrid
-         0     0% 99.91%   26627575   100%  antcolony/internal/engine/naive.(*Engine).Run
-         0     0% 99.91%     294916  1.11%  antcolony/internal/engine/naive.(*World).chooseMove
-         0     0% 99.91%   26324208 98.83%  antcolony/internal/engine/naive.(*World).decay
-         0     0% 99.91%   21536561 80.85%  antcolony/internal/engine/naive.(*World).level
-         0     0% 99.91%     163842  0.62%  antcolony/internal/engine/naive.(*World).passable
-         0     0% 99.91%     294916  1.11%  antcolony/internal/engine/naive.(*World).sense
-         0     0% 99.91%   26627575   100%  antcolony/internal/engine/naive.(*World).tick
-         0     0% 99.91%   26618949 99.93%  antcolony/internal/engine/naive.key (inline)
-         0     0% 99.91%   26627576   100%  main.main
-         0     0% 99.91%   26627576   100%  main.run
-         0     0% 99.91%   26627576   100%  runtime.main
+  25362815 99.84% 99.84%   25365629 99.85%  fmt.Sprintf
+       116 0.00046% 99.84%   24841451 97.79%  antcolony/internal/engine/naive.(*World).decayGrid
+         0     0% 99.84%   25368971 99.87%  antcolony/internal/engine/naive.(*Engine).Run
+         0     0% 99.84%     425989  1.68%  antcolony/internal/engine/naive.(*World).chooseMove
+         0     0% 99.84%   24841451 97.79%  antcolony/internal/engine/naive.(*World).decay
+         0     0% 99.84%   19926060 78.44%  antcolony/internal/engine/naive.(*World).level
+         0     0% 99.84%     196610  0.77%  antcolony/internal/engine/naive.(*World).passable
+         0     0% 99.84%     425989  1.68%  antcolony/internal/engine/naive.(*World).sense
+         0     0% 99.84%   25336203 99.74%  antcolony/internal/engine/naive.(*World).tick
+         0     0% 99.84%   25365629 99.85%  antcolony/internal/engine/naive.key (inline)
+         0     0% 99.84%   25368972 99.87%  main.main
+         0     0% 99.84%   25368972 99.87%  main.run
+         0     0% 99.84%   25368972 99.87%  runtime.main

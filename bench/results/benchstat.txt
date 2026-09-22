@@ -1,30 +1,30 @@
-goos: windows
-goarch: amd64
+goos: darwin
+goarch: arm64
 pkg: antcolony/bench
-cpu: AMD Ryzen 5 5600X 6-Core Processor             
+cpu: Apple M4 Pro
                        │ bench/results/baseline.txt │      bench/results/latest.txt      │
                        │           sec/op           │    sec/op     vs base              │
-Engine/small/naive-12                   799.3m ± 1%    799.3m ± 1%       ~ (p=1.000 n=6)
-Engine/medium/naive-12                   6.451 ± 1%     6.451 ± 1%       ~ (p=1.000 n=6)
-TickRate/naive-12                        6.502 ± 3%     6.502 ± 3%       ~ (p=1.000 n=6)
-Scaling/naive-12                        801.8m ± 3%    801.8m ± 3%       ~ (p=1.000 n=6)
-KeySprintf-12                           70.98n ± 1%    70.98n ± 1%       ~ (p=1.000 n=8)
-KeyStrconv-12                           29.08n ± 1%    29.08n ± 1%       ~ (p=1.000 n=8)
-KeyFlatIndex-12                        0.4502n ± 1%   0.4502n ± 1%       ~ (p=1.000 n=8)
-GridLookupMap-12                        88.34n ± 0%    88.34n ± 0%       ~ (p=1.000 n=8)
-GridLookupFlat-12                      0.4484n ± 1%   0.4484n ± 1%       ~ (p=1.000 n=8)
-RngXoshiro-12                           1.784n ± 1%    1.784n ± 1%       ~ (p=1.000 n=8)
-RngXoshiroIntn-12                       2.749n ± 1%    2.749n ± 1%       ~ (p=1.000 n=8)
-RngMathRandLocal-12                     4.824n ± 0%    4.824n ± 0%       ~ (p=1.000 n=8)
-RngMathRandGlobal-12                    8.837n ± 0%    8.837n ± 0%       ~ (p=1.000 n=8)
-geomean                                 2.564µ         2.564µ       +0.00%
+Engine/small/naive-12                   490.0m ± 5%    490.0m ± 5%       ~ (p=1.000 n=6)
+Engine/medium/naive-12                   4.128 ± 1%     4.128 ± 1%       ~ (p=1.000 n=6)
+TickRate/naive-12                        4.166 ± 2%     4.166 ± 2%       ~ (p=1.000 n=6)
+Scaling/naive-12                        505.6m ± 1%    505.6m ± 1%       ~ (p=1.000 n=6)
+KeySprintf-12                           45.29n ± 3%    45.29n ± 3%       ~ (p=1.000 n=8)
+KeyStrconv-12                           20.45n ± 1%    20.45n ± 1%       ~ (p=1.000 n=8)
+KeyFlatIndex-12                        0.3161n ± 2%   0.3161n ± 2%       ~ (p=1.000 n=8)
+GridLookupMap-12                        56.00n ± 1%    56.00n ± 1%       ~ (p=1.000 n=8)
+GridLookupFlat-12                      0.3245n ± 1%   0.3245n ± 1%       ~ (p=1.000 n=8)
+RngXoshiro-12                           2.694n ± 1%    2.694n ± 1%       ~ (p=1.000 n=8)
+RngXoshiroIntn-12                       2.889n ± 0%    2.889n ± 0%       ~ (p=1.000 n=8)
+RngMathRandLocal-12                     2.830n ± 0%    2.830n ± 0%       ~ (p=1.000 n=8)
+RngMathRandGlobal-12                    5.864n ± 1%    5.864n ± 1%       ~ (p=1.000 n=8)
+geomean                                 1.848µ         1.848µ       +0.00%
 
                        │ bench/results/baseline.txt │       bench/results/latest.txt       │
                        │            B/op            │     B/op      vs base                │
-Engine/small/naive-12                41.59Mi ± 0%     41.59Mi ± 0%       ~ (p=1.000 n=6)
-Engine/medium/naive-12               399.1Mi ± 0%     399.1Mi ± 0%       ~ (p=1.000 n=6)
-TickRate/naive-12                    399.1Mi ± 0%     399.1Mi ± 0%       ~ (p=1.000 n=6)
-Scaling/naive-12                     41.59Mi ± 0%     41.59Mi ± 0%       ~ (p=1.000 n=6)
+Engine/small/naive-12                41.49Mi ± 0%     41.49Mi ± 0%       ~ (p=1.000 n=6)
+Engine/medium/naive-12               397.8Mi ± 0%     397.8Mi ± 0%       ~ (p=1.000 n=6)
+TickRate/naive-12                    397.8Mi ± 0%     397.8Mi ± 0%       ~ (p=1.000 n=6)
+Scaling/naive-12                     41.49Mi ± 0%     41.49Mi ± 0%       ~ (p=1.000 n=6)
 KeySprintf-12                          6.000 ± 0%       6.000 ± 0%       ~ (p=1.000 n=8) ¹
 KeyStrconv-12                          7.000 ± 0%       7.000 ± 0%       ~ (p=1.000 n=8) ¹
 KeyFlatIndex-12                        0.000 ± 0%       0.000 ± 0%       ~ (p=1.000 n=8) ¹
@@ -40,10 +40,10 @@ geomean                                           ²                 +0.00%     
 
                        │ bench/results/baseline.txt │      bench/results/latest.txt       │
                        │         allocs/op          │  allocs/op   vs base                │
-Engine/small/naive-12                 8.244M ± 0%     8.244M ± 0%       ~ (p=1.000 n=6)
-Engine/medium/naive-12                66.23M ± 0%     66.23M ± 0%       ~ (p=1.000 n=6)
-TickRate/naive-12                     66.23M ± 0%     66.23M ± 0%       ~ (p=1.000 n=6)
-Scaling/naive-12                      8.244M ± 0%     8.244M ± 0%       ~ (p=1.000 n=6)
+Engine/small/naive-12                 8.266M ± 0%     8.266M ± 0%       ~ (p=1.000 n=6)
+Engine/medium/naive-12                66.30M ± 0%     66.30M ± 0%       ~ (p=1.000 n=6)
+TickRate/naive-12                     66.30M ± 0%     66.30M ± 0%       ~ (p=1.000 n=6)
+Scaling/naive-12                      8.266M ± 0%     8.266M ± 0%       ~ (p=1.000 n=6)
 KeySprintf-12                          1.000 ± 0%      1.000 ± 0%       ~ (p=1.000 n=8) ¹
 KeyStrconv-12                          1.000 ± 0%      1.000 ± 0%       ~ (p=1.000 n=8) ¹
 KeyFlatIndex-12                        0.000 ± 0%      0.000 ± 0%       ~ (p=1.000 n=8) ¹
@@ -59,4 +59,4 @@ geomean                                           ²                +0.00%      
 
                   │ bench/results/baseline.txt │  bench/results/latest.txt   │
                   │          ticks/s           │  ticks/s    vs base         │
-TickRate/naive-12                   61.52 ± 3%   61.52 ± 3%  ~ (p=1.000 n=6)
+TickRate/naive-12                   96.03 ± 2%   96.03 ± 2%  ~ (p=1.000 n=6)

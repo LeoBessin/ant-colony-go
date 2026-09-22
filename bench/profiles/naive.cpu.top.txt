@@ -1,34 +1,33 @@
 File: antsim.exe
-Build ID: C:\Users\bessi\Code\School\Backend\ant-colony-go\bin\antsim.exe2026-09-21 21:35:48.0405657 +0200 CEST
 Type: cpu
-Time: 2026-09-21 21:35:48 CEST
-Duration: 6.52s, Total samples = 6790ms (104.12%)
-Showing nodes accounting for 5710ms, 84.09% of 6790ms total
-Dropped 62 nodes (cum <= 33.95ms)
-Showing top 25 nodes out of 60
+Time: 2026-09-22 16:56:48 CEST
+Duration: 4.34s, Total samples = 3900ms (89.84%)
+Showing nodes accounting for 3220ms, 82.56% of 3900ms total
+Dropped 32 nodes (cum <= 19.50ms)
+Showing top 25 nodes out of 106
       flat  flat%   sum%        cum   cum%
-     850ms 12.52% 12.52%     1380ms 20.32%  fmt.(*fmt).fmtInteger
-     610ms  8.98% 21.50%     1530ms 22.53%  runtime.mapaccess2_faststr
-     450ms  6.63% 28.13%     2500ms 36.82%  fmt.(*pp).doPrintf
-     390ms  5.74% 33.87%      390ms  5.74%  internal/runtime/maps.ctrlGroup.matchH2 (inline)
-     330ms  4.86% 38.73%      330ms  4.86%  internal/runtime/maps.memHashAES
-     330ms  4.86% 43.59%      440ms  6.48%  runtime.mallocgcTinySC2
-     310ms  4.57% 48.16%     1900ms 27.98%  fmt.(*pp).printArg
-     260ms  3.83% 51.99%      260ms  3.83%  runtime.memmove
-     210ms  3.09% 55.08%     1590ms 23.42%  fmt.(*pp).fmtInteger
-     200ms  2.95% 58.03%      370ms  5.45%  fmt.(*buffer).write (inline)
-     190ms  2.80% 60.82%     4200ms 61.86%  fmt.Sprintf
-     190ms  2.80% 63.62%      330ms  4.86%  sync.(*Pool).pin
-     160ms  2.36% 65.98%      530ms  7.81%  fmt.(*fmt).pad
-     150ms  2.21% 68.19%      430ms  6.33%  fmt.newPrinter
-     130ms  1.91% 70.10%      380ms  5.60%  sync.(*Pool).Put
-     110ms  1.62% 71.72%      630ms  9.28%  runtime.slicebytetostring
-     110ms  1.62% 73.34%      220ms  3.24%  runtime.tryDeferToSpanScan
-     100ms  1.47% 74.82%      100ms  1.47%  runtime.convT64
-     100ms  1.47% 76.29%      160ms  2.36%  runtime.mapassign_faststr
-     100ms  1.47% 77.76%      100ms  1.47%  runtime.spanClass.sizeclass (inline)
-      90ms  1.33% 79.09%     6210ms 91.46%  antcolony/internal/engine/naive.(*World).decayGrid
-      90ms  1.33% 80.41%     1620ms 23.86%  runtime.mapaccess1_faststr
-      90ms  1.33% 81.74%       90ms  1.33%  runtime.procPin (inline)
-      90ms  1.33% 83.06%       90ms  1.33%  runtime.semawakeup
-      70ms  1.03% 84.09%     4370ms 64.36%  antcolony/internal/engine/naive.key (inline)
+     400ms 10.26% 10.26%      580ms 14.87%  fmt.(*fmt).fmtInteger
+     310ms  7.95% 18.21%     1240ms 31.79%  fmt.(*pp).doPrintf
+     290ms  7.44% 25.64%      770ms 19.74%  runtime.mapaccess1_faststr
+     280ms  7.18% 32.82%      280ms  7.18%  runtime.madvise
+     200ms  5.13% 37.95%      200ms  5.13%  runtime.pthread_cond_signal
+     180ms  4.62% 42.56%      180ms  4.62%  runtime.memmove
+     170ms  4.36% 46.92%      170ms  4.36%  aeshashbody
+     150ms  3.85% 50.77%      820ms 21.03%  fmt.(*pp).printArg
+     150ms  3.85% 54.62%      300ms  7.69%  runtime.mallocgcTiny
+      90ms  2.31% 56.92%      180ms  4.62%  fmt.(*fmt).pad
+      90ms  2.31% 59.23%      670ms 17.18%  fmt.(*pp).fmtInteger
+      90ms  2.31% 61.54%       90ms  2.31%  internal/runtime/maps.probeSeq.next (inline)
+      90ms  2.31% 63.85%       90ms  2.31%  runtime.tryDeferToSpanScan
+      80ms  2.05% 65.90%      510ms 13.08%  runtime.slicebytetostring
+      70ms  1.79% 67.69%      110ms  2.82%  fmt.(*buffer).writeString (inline)
+      70ms  1.79% 69.49%       70ms  1.79%  runtime.kevent
+      70ms  1.79% 71.28%      150ms  3.85%  sync.(*Pool).Get
+      60ms  1.54% 72.82%     2150ms 55.13%  fmt.Sprintf
+      60ms  1.54% 74.36%      210ms  5.38%  fmt.newPrinter
+      60ms  1.54% 75.90%       60ms  1.54%  internal/runtime/maps.(*groupReference).key (inline)
+      60ms  1.54% 77.44%      390ms 10.00%  runtime.mallocgc
+      50ms  1.28% 78.72%     2310ms 59.23%  antcolony/internal/engine/naive.(*World).level
+      50ms  1.28% 80.00%      130ms  3.33%  fmt.(*pp).free
+      50ms  1.28% 81.28%       50ms  1.28%  runtime.convT64
+      50ms  1.28% 82.56%       80ms  2.05%  sync.(*Pool).Put
