@@ -33,8 +33,27 @@ func scenarioPath(name string) string {
 	return filepath.Join("..", "internal", "config", "scenarios", name+".json")
 }
 
-func goldenPath(name string) string {
-	return filepath.Join("testdata", "golden", name+".json")
+// A golden file is keyed by an engine's VARIANT (see simcore.VariantOf), not
+// by a list maintained here. Optimization stages declare nothing and therefore
+// land in the default family, where they are held to `naive` bit for bit --
+// which is the premise of the whole audit report. An engine that deliberately
+// changes what the simulation computes declares a variant in its own package
+// and is held to its own reference file instead.
+
+// familyReference names the engine whose output DEFINES each family's golden.
+// This one IS deliberate and hand-written: "which engine is the truth for this
+// simulation" is a decision, not something to infer. TestGoldenFamilies checks
+// it stays consistent with what the engines declare.
+var familyReference = map[string]string{
+	"":         "naive",
+	"gradient": "gradient",
+}
+
+func goldenPath(family, name string) string {
+	if family == "" {
+		return filepath.Join("testdata", "golden", name+".json")
+	}
+	return filepath.Join("testdata", "golden", family, name+".json")
 }
 
 // canonical strips everything that is allowed to vary between runs. Wall time
@@ -87,36 +106,69 @@ func TestGolden(t *testing.T) {
 			cfg := loadScenario(t, sc.name)
 
 			if update {
-				got := canonical(runEngine(t, "naive", cfg))
-				b, err := json.MarshalIndent(got, "", "  ")
-				if err != nil {
-					t.Fatal(err)
+				for family, ref := range familyReference {
+					got := canonical(runEngine(t, ref, cfg))
+					b, err := json.MarshalIndent(got, "", "  ")
+					if err != nil {
+						t.Fatal(err)
+					}
+					path := goldenPath(family, sc.name)
+					if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+						t.Fatal(err)
+					}
+					if err := os.WriteFile(path, append(b, '\n'), 0o644); err != nil {
+						t.Fatal(err)
+					}
+					t.Logf("updated %s (from engine %q)", path, ref)
 				}
-				if err := os.MkdirAll(filepath.Dir(goldenPath(sc.name)), 0o755); err != nil {
-					t.Fatal(err)
-				}
-				if err := os.WriteFile(goldenPath(sc.name), append(b, '\n'), 0o644); err != nil {
-					t.Fatal(err)
-				}
-				t.Logf("updated %s", goldenPath(sc.name))
 				return
 			}
 
-			raw, err := os.ReadFile(goldenPath(sc.name))
-			if err != nil {
-				t.Fatalf("missing golden file (run: UPDATE_GOLDEN=1 go test ./test/...): %v", err)
-			}
-			var want simcore.Result
-			if err := json.Unmarshal(raw, &want); err != nil {
-				t.Fatal(err)
+			want := map[string]simcore.Result{}
+			load := func(family string) simcore.Result {
+				if r, ok := want[family]; ok {
+					return r
+				}
+				path := goldenPath(family, sc.name)
+				raw, err := os.ReadFile(path)
+				if err != nil {
+					t.Fatalf("missing golden file %s (run: UPDATE_GOLDEN=1 go test ./test/...): %v", path, err)
+				}
+				var r simcore.Result
+				if err := json.Unmarshal(raw, &r); err != nil {
+					t.Fatal(err)
+				}
+				want[family] = r
+				return r
 			}
 
-			// Every registered engine, present and future, must match.
+			// Every registered engine, present and future, must match the
+			// golden of ITS family -- and the default family is `naive`, so a
+			// new optimization stage is gated automatically.
 			for _, name := range simcore.Names() {
+				eng, err := simcore.New(name)
+				if err != nil {
+					t.Fatalf("engine %s: %v", name, err)
+				}
+				family := simcore.VariantOf(eng)
 				got := canonical(runEngine(t, name, cfg))
-				if !got.DeterministicEqual(want) {
-					t.Errorf("engine %q diverged from golden %s:\n got %+v\nwant %+v",
-						name, sc.name, got, want)
+				if !got.DeterministicEqual(load(family)) {
+					t.Errorf("engine %q diverged from golden %s (family %q):\n got %+v\nwant %+v",
+						name, sc.name, family, got, load(family))
+				}
+			}
+
+			// A family whose reference engine produces the same checksum as
+			// the baseline is not a separate simulation at all -- it is an
+			// optimization stage that has been let off the invariant by
+			// mistake. Catch that, because it is a silent hole in the gate.
+			for family, ref := range familyReference {
+				if family == "" {
+					continue
+				}
+				if load(family).DeterministicEqual(load("")) {
+					t.Errorf("engine %q has its own golden family but reproduces the baseline exactly; "+
+						"remove it from engineFamily so it is gated against naive", ref)
 				}
 			}
 		})
@@ -209,5 +261,36 @@ func (o *countingObserver) OnTick(_ int, s *simcore.Snapshot) {
 	o.calls++
 	if s == nil {
 		panic("nil snapshot")
+	}
+}
+
+// TestGoldenFamilies keeps familyReference honest.
+//
+// Two ways this can rot: an engine declares a variant that has no reference
+// file to be checked against, or a reference engine is listed under a family
+// it does not actually belong to. Either one silently drops an engine out of
+// the correctness gate, which is the one thing the gate must not do.
+func TestGoldenFamilies(t *testing.T) {
+	for family, ref := range familyReference {
+		eng, err := simcore.New(ref)
+		if err != nil {
+			t.Errorf("familyReference[%q] = %q, which is not a registered engine: %v", family, ref, err)
+			continue
+		}
+		if got := simcore.VariantOf(eng); got != family {
+			t.Errorf("familyReference says %q defines family %q, but that engine declares variant %q",
+				ref, family, got)
+		}
+	}
+	for _, name := range simcore.Names() {
+		eng, err := simcore.New(name)
+		if err != nil {
+			t.Fatal(err)
+		}
+		v := simcore.VariantOf(eng)
+		if _, ok := familyReference[v]; !ok {
+			t.Errorf("engine %q declares variant %q, but no golden reference engine is defined for it; "+
+				"add it to familyReference and run make golden", name, v)
+		}
 	}
 }

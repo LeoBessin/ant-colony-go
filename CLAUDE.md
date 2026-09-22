@@ -89,6 +89,7 @@ internal/
   simcore/         CONTRATS UNIQUEMENT — Engine, Result, Snapshot, Observer, Rng, hash
   engine/
     naive/         baseline v0 — délibérément lente
+    gradient/      VARIANTE sémantique de v0, pas un étage : golden à part
     register.go    blank-import de chaque moteur : un binaire les contient tous
   uiserver/        HTTP + SSE + front-end canvas
 
@@ -192,9 +193,10 @@ ce sont celles dont dépend la note.
 
 ### Feuille de route — planifiée, PAS encore construite
 
-Seul `naive` existe. Chaque étage ci-dessous représente une séance de cours,
-réalisée profilage en main. Ne pas les construire avant le profilage qui les
-justifie.
+Aucun étage d'optimisation n'existe encore : seuls `naive` (la baseline) et
+`gradient` (une variante sémantique, voir §9) sont construits. Chaque étage
+ci-dessous représente une séance de cours, réalisée profilage en main. Ne pas
+les construire avant le profilage qui les justifie.
 
 | Étage | Package | Changement | Axe du barème |
 |---|---|---|---|
@@ -296,3 +298,35 @@ l'étage v1 la grille devenue un `[]uint32` plat, une grille coûte
 Le palier `medium` → `large` est l'endroit où le travail de localité doit
 commencer à payer visiblement. Capturer la spécification machine avec
 `make env` avant chaque session de mesure ; elle atterrit dans `docs/env/`.
+
+---
+
+## 9. Variantes de simulation
+
+Un moteur qui change la **vitesse** doit reproduire `naive` bit pour bit : c'est
+la prémisse de tout le rapport. Un moteur qui change ce que la simulation
+**calcule** est une *variante*, et ne peut pas être tenu au checksum de `naive`
+— mais le sortir du test golden le priverait de toute garantie de déterminisme.
+
+- `simcore.Variant` est une interface **optionnelle**. Ne pas l'implémenter
+  signifie « simulation de référence ». Ce défaut est porteur : un étage
+  d'optimisation hérite de l'obligation de reproduire `naive` **en ne disant
+  rien**, et ne peut donc pas y échapper par oubli. Un étage v1→v6 n'implémente
+  jamais `Variant`.
+- Chaque variante a son fichier de référence,
+  `test/testdata/golden/<variante>/<scénario>.json`, et subit exactement le même
+  test dans sa propre famille. `familyReference` (dans `test/golden_test.go`)
+  nomme le moteur qui *définit* la vérité de chaque famille ; c'est une
+  décision, écrite à la main, vérifiée par `TestGoldenFamilies`.
+- L'UI groupe checksum de référence et base de speedup par variante : deux
+  simulations différentes ne sont pas des alternatives l'une de l'autre, et
+  annoncer l'une comme une accélération de l'autre n'aurait aucun sens.
+
+`gradient` est la seule variante à ce jour. Elle corrige un défaut de
+navigation de `naive` — les phéromones y encodent une densité de passage et non
+une distance, de sorte qu'une fourmi chargée n'a aucun gradient exploitable pour
+rentrer. Voir `docs/journal/03-moteur-gradient.md` pour les mesures, et le
+commentaire de paquet de `internal/engine/gradient` pour le mécanisme.
+
+Une variante n'est **pas** une échappatoire. Elle se justifie par une mesure qui
+montre que le comportement de référence est cassé, jamais par une préférence.

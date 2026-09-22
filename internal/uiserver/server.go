@@ -239,6 +239,7 @@ type benchRequest struct {
 
 type benchRow struct {
 	Engine     string  `json:"engine"`
+	Variant    string  `json:"variant,omitempty"`
 	WallMS     float64 `json:"wall_ms"`
 	TicksPerS  float64 `json:"ticks_per_s"`
 	Allocs     uint64  `json:"allocs"`
@@ -292,9 +293,13 @@ func (s *Server) handleBench(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	rows := make([]benchRow, 0, len(engines))
-	var baseline float64
-	var refChecksum uint64
-	var haveRef bool
+	// Both the checksum reference and the speedup baseline are per VARIANT.
+	// Engines implementing different simulations are not alternatives to each
+	// other: calling one a speedup of the other would be meaningless, and
+	// flagging their differing checksums as a mismatch would cry wolf on the
+	// one signal that is supposed to mean "an optimization broke something".
+	baseline := map[string]float64{}
+	refChecksum := map[string]uint64{}
 
 	for _, name := range engines {
 		row := benchRow{Engine: name}
@@ -334,19 +339,21 @@ func (s *Server) handleBench(w http.ResponseWriter, r *http.Request) {
 		row.HeapMB = float64(best.HeapBytes) / (1 << 20)
 		row.Collected = best.FoodCollected
 		row.Checksum = fmt.Sprintf("%#016x", best.StateChecksum)
+		row.Variant = simcore.VariantOf(eng)
 
-		// Every engine must agree on the outcome. A mismatch means an
-		// "optimization" changed the simulation, and its speed is irrelevant.
-		if !haveRef {
-			refChecksum, haveRef = best.StateChecksum, true
-		} else if best.StateChecksum != refChecksum {
+		// Within a variant, every engine must agree on the outcome. A mismatch
+		// means an "optimization" changed the simulation, and its speed is
+		// irrelevant.
+		if ref, ok := refChecksum[row.Variant]; !ok {
+			refChecksum[row.Variant] = best.StateChecksum
+		} else if best.StateChecksum != ref {
 			row.Mismatched = true
 		}
-		if baseline == 0 {
-			baseline = row.WallMS
+		if baseline[row.Variant] == 0 {
+			baseline[row.Variant] = row.WallMS
 		}
 		if row.WallMS > 0 {
-			row.SpeedupX = baseline / row.WallMS
+			row.SpeedupX = baseline[row.Variant] / row.WallMS
 		}
 		rows = append(rows, row)
 	}
