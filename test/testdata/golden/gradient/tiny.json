@@ -1,0 +1,17 @@
+{
+  "engine": "",
+  "config_hash": 7637343155580285632,
+  "seed": 20260921,
+  "ticks": 400,
+  "ticks_run": 400,
+  "food_collected": 80,
+  "food_remaining": 0,
+  "ants_carrying": 0,
+  "total_pheromone": 128869,
+  "ant_pos_hash": 14901997239902303841,
+  "grid_hash": 13274642011428481896,
+  "state_checksum": 3929028314116342267,
+  "wall_ns": 0,
+  "allocs": 0,
+  "heap_bytes": 0
+}

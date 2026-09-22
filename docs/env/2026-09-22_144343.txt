@@ -1,0 +1,14 @@
+=== bench machine specification ===
+captured: 2026-09-22T14:43:43+02:00
+
+--- runtime ---
+go version go1.27.1-X:nodwarf5 linux/amd64
+linux
+amd64
+v1
+
+1
+
+--- cpu / cache / memory / os ---
+
+--- power plan (turbo/idle behaviour affects variance) ---

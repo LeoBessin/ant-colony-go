@@ -63,3 +63,29 @@ func Names() []string {
 	sort.Strings(out)
 	return out
 }
+
+// Variant reports which SIMULATION an engine implements.
+//
+// It is optional, and the zero value -- an engine that does not implement it
+// -- means the baseline simulation defined by `naive`. That default is the
+// load-bearing part: an optimization stage is required to reproduce the
+// baseline bit for bit, and because it inherits that requirement by saying
+// nothing, it cannot escape the golden gate by forgetting to declare itself.
+//
+// An engine only declares a variant when it deliberately changes what the
+// simulation COMPUTES rather than how fast it computes it. Such an engine is
+// still held to a golden file and still has to be deterministic; it is simply
+// held to its own, because measuring it against a different simulation's
+// checksum would prove nothing. It also must not be presented as a speedup of
+// the baseline, which is why the harness groups comparisons by variant.
+type Variant interface {
+	Variant() string
+}
+
+// VariantOf reports e's variant, or "" for the baseline simulation.
+func VariantOf(e Engine) string {
+	if v, ok := e.(Variant); ok {
+		return v.Variant()
+	}
+	return ""
+}

@@ -297,8 +297,11 @@ function renderBench(data) {
       tbody.append(tr);
       continue;
     }
+    // Engines declaring a variant implement a DIFFERENT simulation, so their
+    // checksum is expected to differ and their speedup is measured against
+    // their own variant's first row, not against naive.
     tr.append(
-      cell(r.engine),
+      cell(r.variant ? `${r.engine} (${r.variant})` : r.engine),
       cell(r.wall_ms.toFixed(1)),
       cell(Math.round(r.ticks_per_s).toLocaleString()),
       cell(r.speedup_x >= 1 ? r.speedup_x.toFixed(2) + "x" : r.speedup_x.toFixed(2) + "x",
@@ -316,7 +319,7 @@ function renderBench(data) {
     bad
       ? `${bad} engine(s) produced a DIFFERENT simulation — their speed does not count`
       : `${data.scenario} · seed ${data.seed} · ${data.ticks} ticks · ` +
-        `${data.ants} ants · best of ${data.repeat} · all checksums agree`,
+        `${data.ants} ants · best of ${data.repeat} · checksums agree within each variant`,
     bad > 0
   );
 }
