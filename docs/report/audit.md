@@ -198,6 +198,54 @@ sur cette fraction (`1 / (1 − 0,749)`), avant apparition du goulot suivant
 > est un minorant, pas une prédiction — détail et explication mécanique dans
 > [`docs/journal/04-flatgrid.md`](../journal/04-flatgrid.md).
 
+### 2.4 Utilisation CPU & RAM (compteurs matériels)
+
+`pprof` mesure des **pourcentages de temps CPU**, pas l'utilisation réelle des
+cœurs ni la mémoire effectivement occupée par le process. Deux instruments
+distincts pour ces deux questions-là :
+
+```bash
+/usr/bin/time -l ./bin/antsim.exe -quiet -config internal/config/scenarios/medium.json -engine naive    >/dev/null
+/usr/bin/time -l ./bin/antsim.exe -quiet -config internal/config/scenarios/medium.json -engine flatgrid >/dev/null
+```
+
+| Métrique | v0 `naive` | v1 `flatgrid` | Rapport |
+|---|---:|---:|---:|
+| Temps réel (`real`) | 3,94 s | 0,04 s | 98,5× |
+| Temps CPU (`user`) | 4,25 s | 0,04 s | 106× |
+| Instructions retirées | 93,06 G | 1,28 G | **72,5×** |
+| Cycles écoulés | 18,47 G | 0,19 G | **96,0×** |
+| IPC (instructions/cycle) | 5,04 | 6,67 | — |
+| Empreinte mémoire crête (`peak memory footprint`) | 19,4 Mio | 10,6 Mio | 1,84× |
+| RSS max (`maximum resident set size`) | 21,5 Mio | 12,6 Mio | 1,71× |
+
+**Deux lectures, pas une seule :**
+
+1. **CPU — corroboration indépendante du gain.** Le compteur matériel
+   d'instructions (72,5×) et de cycles (96,0×) confirme le ≈106× mesuré par
+   `benchstat` et `hyperfine` (§5.3), par une voie complètement différente
+   (compteurs du noyau, pas échantillonnage `pprof`). Fait notable :
+   `user` (4,25 s) **dépasse** `real` (3,94 s) sur `naive` — plus d'un cœur a
+   travaillé en moyenne, alors que le tick lui-même est strictement
+   mono-thread (§3.2). C'est le ramasse-miettes concurrent de Go : les 66 M
+   allocations/run forcent un marquage/balayage en tâche de fond sur des
+   threads séparés. `flatgrid` n'a quasiment plus cet écart (`user` ≈ `real`)
+   — encore une confirmation que la pression GC, pas la boucle de tick,
+   consommait le cœur supplémentaire.
+
+2. **RAM — ce n'est PAS le même signal que `B/op`.** `B/op` (§2.2, §5.3)
+   mesure un **débit d'allocation cumulé sur tout le run** (397,8 Mio pour
+   `naive`, ÷46 en `flatgrid`) — c'est du mémoire *churné*, alloué puis
+   collecté en boucle. L'empreinte **crête** réelle du process ne bouge que
+   d'un facteur **1,7-1,8×** (19,4 → 10,6 Mio). `naive` n'a jamais eu un
+   problème de RAM au sens où le process "dépasserait" un budget — le
+   problème était le débit d'allocation (donc le CPU consommé à
+   allouer/collecter), pas la quantité retenue en mémoire à un instant donné.
+   Sur les 24 Go de cette machine (§1.1), les deux moteurs sont de toute
+   façon anecdotiques : le sujet n'est jamais "est-ce que ça tient en RAM"
+   mais "combien de cycles CPU le trafic mémoire consomme-t-il" — ce que la
+   hiérarchie de cache (§1.3) mesure mieux que la RAM totale.
+
 ---
 
 ## 3. Journal d'optimisation
@@ -271,7 +319,6 @@ La ligne v0 → v1, remplie — entrée complète :
       `Engine/medium`, allocs/op ÷401, checksum identique.** Détail :
       [`docs/journal/04-flatgrid.md`](../journal/04-flatgrid.md).
 - [ ] _(optionnel)_ v2 `soa` — `[]*Ant` → AoS → SoA ; alignement des champs, `int32`/`uint8`
-- [ ] _(optionnel)_ v3 `nogc` — tampons préalloués, suppression de `Ant.Trail`, zéro allocation
 
 ### 3.2 Concurrence & scalabilité CPU
 
@@ -352,6 +399,7 @@ Tout ce qui a produit un chiffre cité dans ce rapport, en une seule table :
 | Ligne exacte du hot path | — | `go tool pprof -list 'naive\.key$' -trim_path=antcolony/ naive.cpu.pprof` |
 | Flamegraph interactif | — | `go tool pprof -http=:8080 naive.cpu.pprof` |
 | Isoler par mot-clé | — | `go tool pprof -top -cum -focus=key naive.cpu.pprof` |
+| CPU/RAM réels (compteurs matériels) | — | `/usr/bin/time -l ./bin/antsim.exe -quiet -config ... -engine {engine}` |
 | Tableaux du rapport | `make report` | concatène `bench/results/`, `bench/profiles/` → `docs/report/generated-tables.md` |
 | Exécution headless unique | `make run` | `./bin/antsim.exe -config internal/config/scenarios/medium.json -engine naive` |
 | Interface web | `make web` | `go run ./cmd/antweb` |

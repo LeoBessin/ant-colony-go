@@ -31,8 +31,8 @@ package scent
 
 import (
 	"context"
-	"fmt"
 	"runtime"
+	"strconv"
 	"time"
 
 	"antcolony/internal/config"
@@ -98,15 +98,15 @@ type World struct {
 
 	Ants []*Ant // slice of POINTERS: every ant is a separate heap object
 
-	Walls map[string]bool
-	Food  map[string]int
+	Walls []bool
+	Food  []int
 
-	PheroFood map[string]uint32 // current level, read by phase A
-	PheroHome map[string]uint32
-	depFood   map[string]uint32 // deposits accumulated during phase B
-	depHome   map[string]uint32
-	nextFood  map[string]uint32 // write buffer for phase C
-	nextHome  map[string]uint32
+	PheroFood []uint32 // current level, read by phase A
+	PheroHome []uint32
+	depFood   []uint32 // deposits accumulated during phase B
+	depHome   []uint32
+	nextFood  []uint32 // write buffer for phase C
+	nextHome  []uint32
 
 	intents []intent
 
@@ -121,10 +121,21 @@ type World struct {
 	scentBias uint64
 }
 
-// key is the naive cell address. fmt.Sprintf allocates a string on every
-// single call, and there are ~10 calls per cell per tick. The constitution
-// bans this construct precisely because of what the profiler will show here.
-func key(x, y int64) string { return fmt.Sprintf("%d,%d", x, y) }
+// idx is the flat cell address: one multiply-add, no allocation, no hash.
+// Replaces the string key(x,y) this package used before — profiling showed
+// it at 61.86% of CPU and 99.60% of allocations (docs/journal/06-scentgrid.md),
+// the exact same shape as naive's pre-v1 profile, because this package was
+// branched from gradient/naive before flatgrid existed.
+func (w *World) idx(x, y int64) int64 { return y*w.W + x }
+
+// trailKey builds the same "x,y" string the old key(x,y) produced, but with
+// strconv instead of fmt.Sprintf. Exists only because Ant.Trail (still a
+// []string — nobody reads it, v3-equivalent cleanup would remove it) needs
+// *a* string; this keeps the package free of fmt.Sprintf without touching
+// Trail's behavior.
+func trailKey(x, y int64) string {
+	return strconv.FormatInt(x, 10) + "," + strconv.FormatInt(y, 10)
+}
 
 // Fixed scan order: N, NE, E, SE, S, SW, W, NW.
 //
@@ -136,19 +147,21 @@ var dirDX = [8]int64{0, 1, 1, 1, 0, -1, -1, -1}
 var dirDY = [8]int64{-1, -1, 0, 1, 1, 1, 0, -1}
 
 func newWorld(cfg config.Config) *World {
+	W, H := int64(cfg.Width), int64(cfg.Height)
+	cells := W * H
 	w := &World{
 		cfg:       cfg,
-		W:         int64(cfg.Width),
-		H:         int64(cfg.Height),
+		W:         W,
+		H:         H,
 		Nest:      Point{int64(cfg.Nest.X), int64(cfg.Nest.Y)},
-		Walls:     make(map[string]bool),
-		Food:      make(map[string]int),
-		PheroFood: make(map[string]uint32),
-		PheroHome: make(map[string]uint32),
-		depFood:   make(map[string]uint32),
-		depHome:   make(map[string]uint32),
-		nextFood:  make(map[string]uint32),
-		nextHome:  make(map[string]uint32),
+		Walls:     make([]bool, cells),
+		Food:      make([]int, cells),
+		PheroFood: make([]uint32, cells),
+		PheroHome: make([]uint32, cells),
+		depFood:   make([]uint32, cells),
+		depHome:   make([]uint32, cells),
+		nextFood:  make([]uint32, cells),
+		nextHome:  make([]uint32, cells),
 		intents:   make([]intent, cfg.AntCount),
 		randomNum: cfg.Movement.RandomNum,
 		randomDen: cfg.Movement.RandomDen,
@@ -168,12 +181,12 @@ func newWorld(cfg config.Config) *World {
 	for _, r := range cfg.Walls {
 		for y := r.Y; y < r.Y+r.H; y++ {
 			for x := r.X; x < r.X+r.W; x++ {
-				w.Walls[key(int64(x), int64(y))] = true
+				w.Walls[w.idx(int64(x), int64(y))] = true
 			}
 		}
 	}
 	for _, f := range cfg.Food {
-		k := key(int64(f.At.X), int64(f.At.Y))
+		k := w.idx(int64(f.At.X), int64(f.At.Y))
 		w.Food[k] += f.Amount
 		w.FoodLeft += int64(f.Amount)
 		w.piles = append(w.piles, Point{int64(f.At.X), int64(f.At.Y)})

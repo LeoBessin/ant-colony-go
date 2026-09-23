@@ -82,7 +82,7 @@ func (w *World) chooseMove(a *Ant) intent {
 		if !w.passable(nx, ny) {
 			continue
 		}
-		score := uint64(trail[key(nx, ny)])
+		score := uint64(trail[w.idx(nx, ny)])
 		if a.HasFood && cheb(nx, ny, w.Nest) < cheb(a.X, a.Y, w.Nest) {
 			score += w.nestBias
 		}
@@ -112,7 +112,7 @@ func (w *World) nearestScent(x, y int64) (Point, bool) {
 	var best Point
 	bestD := int64(-1)
 	for _, p := range w.piles {
-		if w.Food[key(p.X, p.Y)] <= 0 {
+		if w.Food[w.idx(p.X, p.Y)] <= 0 {
 			continue
 		}
 		d := cheb(x, y, p)
@@ -138,7 +138,7 @@ func (w *World) passable(x, y int64) bool {
 	if x < 0 || y < 0 || x >= w.W || y >= w.H {
 		return false
 	}
-	return !w.Walls[key(x, y)]
+	return !w.Walls[w.idx(x, y)]
 }
 
 func cheb(x, y int64, p Point) int64 {
@@ -166,15 +166,15 @@ func (w *World) commit() {
 		a.X, a.Y, a.Dir, a.Blocked = in.NX, in.NY, in.Dir, in.Blocked
 		a.Steps++
 
-		k := key(a.X, a.Y)
+		cell := w.idx(a.X, a.Y)
 
 		// A growing string history nobody reads. This is the clearest single
 		// source of GC pressure in v0 and the first thing stage v3 deletes.
-		a.Trail = append(a.Trail, k)
+		a.Trail = append(a.Trail, trailKey(a.X, a.Y))
 
 		if !a.HasFood {
-			if n := w.Food[k]; n > 0 {
-				w.Food[k] = n - 1
+			if n := w.Food[cell]; n > 0 {
+				w.Food[cell] = n - 1
 				w.FoodLeft--
 				a.HasFood = true
 				a.Dir = (a.Dir + 4) & 7 // head back the way it came
@@ -198,9 +198,9 @@ func (w *World) commit() {
 		// an ant that had to walk around a wall reports the longer distance
 		// and the field encodes geodesic, not straight-line, closeness.
 		if a.HasFood {
-			w.depFood[k] = addSat(w.depFood[k], falloff(p.DepositFood, a.Steps), p.Max)
+			w.depFood[cell] = addSat(w.depFood[cell], falloff(p.DepositFood, a.Steps), p.Max)
 		} else {
-			w.depHome[k] = addSat(w.depHome[k], falloff(p.DepositHome, a.Steps), p.Max)
+			w.depHome[cell] = addSat(w.depHome[cell], falloff(p.DepositHome, a.Steps), p.Max)
 		}
 	}
 }
@@ -264,20 +264,17 @@ func (w *World) decay() {
 	clear(w.nextHome)
 }
 
-func (w *World) decayGrid(cur, dep, next map[string]uint32, p config.PheromoneParams) {
+func (w *World) decayGrid(cur, dep, next []uint32, p config.PheromoneParams) {
 	dn, dd := uint64(p.DiffNum), uint64(p.DiffDen)
 	en, ed := uint64(p.EvapNum), uint64(p.EvapDen)
 	max := uint64(p.Max)
 
-	// Row-major traversal over every cell.
-	//
-	// NEVER "for k := range cur". Go randomizes map iteration order, so that
-	// loop would visit cells differently on every execution and the run would
-	// stop being reproducible. The maps here are lookup structures only.
+	// Row-major traversal over every cell — the definition of the simulation
+	// (CLAUDE.md §4 rule 5), not a property of the map this used to read from.
 	for y := int64(0); y < w.H; y++ {
 		for x := int64(0); x < w.W; x++ {
-			k := key(x, y)
-			v := uint64(cur[k]) + uint64(dep[k])
+			i := w.idx(x, y)
+			v := uint64(cur[i]) + uint64(dep[i])
 
 			in := w.level(cur, dep, x, y-1) +
 				w.level(cur, dep, x, y+1) +
@@ -296,17 +293,17 @@ func (w *World) decayGrid(cur, dep, next map[string]uint32, p config.PheromonePa
 				v = max
 			}
 			if v != 0 {
-				next[k] = uint32(v)
+				next[i] = uint32(v)
 			}
 		}
 	}
 }
 
 // level reads a cell's pre-decay level, treating out-of-bounds as empty.
-func (w *World) level(cur, dep map[string]uint32, x, y int64) uint64 {
+func (w *World) level(cur, dep []uint32, x, y int64) uint64 {
 	if x < 0 || y < 0 || x >= w.W || y >= w.H {
 		return 0
 	}
-	k := key(x, y)
-	return uint64(cur[k]) + uint64(dep[k])
+	i := w.idx(x, y)
+	return uint64(cur[i]) + uint64(dep[i])
 }

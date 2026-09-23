@@ -29,8 +29,8 @@ func (w *World) result() simcore.Result {
 	var total uint64
 	for y := int64(0); y < w.H; y++ {
 		for x := int64(0); x < w.W; x++ {
-			k := key(x, y)
-			fv, hv := w.PheroFood[k], w.PheroHome[k]
+			i := w.idx(x, y)
+			fv, hv := w.PheroFood[i], w.PheroHome[i]
 			gh = simcore.HashU32(gh, fv)
 			gh = simcore.HashU32(gh, hv)
 			total += uint64(fv) + uint64(hv)
@@ -80,16 +80,16 @@ func (w *World) snapshot(tick int, done bool) *simcore.Snapshot {
 	max := uint64(w.cfg.Pheromone.Max)
 	for y := int64(0); y < w.H; y++ {
 		for x := int64(0); x < w.W; x++ {
-			k := key(x, y)
-			i := int(y*w.W + x)
-			s.PheroFood[i] = scale(uint64(w.PheroFood[k]), max)
-			s.PheroHome[i] = scale(uint64(w.PheroHome[k]), max)
-			if n := w.Food[k]; n > 0 {
+			cell := w.idx(x, y)
+			out := int(y*w.W + x)
+			s.PheroFood[out] = scale(uint64(w.PheroFood[cell]), max)
+			s.PheroHome[out] = scale(uint64(w.PheroHome[cell]), max)
+			if n := w.Food[cell]; n > 0 {
 				s.Food = append(s.Food, int32(x), int32(y), int32(n))
 			}
 			// Walls never change, so they ride along on the first frame only
 			// and the browser caches them.
-			if tick == 0 && w.Walls[k] {
+			if tick == 0 && w.Walls[cell] {
 				s.Walls = append(s.Walls, int32(x), int32(y))
 			}
 		}
