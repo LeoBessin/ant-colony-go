@@ -11,5 +11,6 @@ import (
 	_ "antcolony/internal/engine/flatgrid"
 	_ "antcolony/internal/engine/gradient"
 	_ "antcolony/internal/engine/naive"
+	_ "antcolony/internal/engine/parallel"
 	_ "antcolony/internal/engine/scent"
 )
