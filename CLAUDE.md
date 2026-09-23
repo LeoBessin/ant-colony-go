@@ -90,6 +90,7 @@ internal/
   engine/
     naive/         baseline v0 — délibérément lente
     gradient/      VARIANTE sémantique de v0, pas un étage : golden à part
+    scent/         VARIANTE construite sur gradient : golden à part
     register.go    blank-import de chaque moteur : un binaire les contient tous
   uiserver/        HTTP + SSE + front-end canvas
 
@@ -194,7 +195,7 @@ ce sont celles dont dépend la note.
 ### Feuille de route — planifiée, PAS encore construite
 
 Aucun étage d'optimisation n'existe encore : seuls `naive` (la baseline) et
-`gradient` (une variante sémantique, voir §9) sont construits. Chaque étage
+`gradient` et `scent` (des variantes sémantiques, voir §9) sont construits. Chaque étage
 ci-dessous représente une séance de cours, réalisée profilage en main. Ne pas
 les construire avant le profilage qui les justifie.
 
@@ -346,6 +347,11 @@ navigation de `naive` — les phéromones y encodent une densité de passage et 
 une distance, de sorte qu'une fourmi chargée n'a aucun gradient exploitable pour
 rentrer. Voir `docs/journal/03-moteur-gradient.md` pour les mesures, et le
 commentaire de paquet de `internal/engine/gradient` pour le mécanisme.
+
+`scent` est construite sur `gradient` et corrige la *recherche* : une fourmi
+sans charge sent le tas non vide le plus proche dans un rayon de 24 cases, alors
+que dans `naive`/`gradient` un tas jamais atteint est invisible. Voir
+`docs/journal/05-moteur-scent.md`.
 
 Une variante n'est **pas** une échappatoire. Elle se justifie par une mesure qui
 montre que le comportement de référence est cassé, jamais par une préférence.

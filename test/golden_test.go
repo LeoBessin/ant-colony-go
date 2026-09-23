@@ -47,6 +47,7 @@ func scenarioPath(name string) string {
 var familyReference = map[string]string{
 	"":         "naive",
 	"gradient": "gradient",
+	"scent":    "scent",
 }
 
 func goldenPath(family, name string) string {
