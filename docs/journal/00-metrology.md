@@ -5,18 +5,18 @@
 
 ## Banc d'essai
 
-Capture automatique : `make env` → `docs/env/<horodatage>.txt`.
+Capture automatique : `make env` → `docs/env/<horodatage>.txt` (dernière :
+[`docs/env/2026-09-22_164722.txt`](../env/2026-09-22_164722.txt)).
 
 | Élément | Valeur |
 |---|---|
-| CPU | AMD Ryzen 5 5600X, 6 cœurs physiques / 12 threads |
-| Fréquence de base | 3701 MHz |
-| Cache L1 | 384 Ko |
-| Cache L2 | 3072 Ko (6 × 512 Ko, privé par cœur) |
-| Cache L3 | 32768 Ko (partagé) |
-| RAM | 16 Go DDR4, 3200 MHz (configuré 3200) |
-| OS | Windows 11 Pro 10.0.26200 |
-| Runtime | go1.27.1 windows/amd64, CGO_ENABLED=0, GOAMD64=v1 |
+| CPU | Apple M4 Pro, 12 cœurs physiques / 12 threads (pas de SMT) |
+| Cache L1 | 128 Ko icache + 64 Ko dcache, par cœur |
+| Cache L2 | 4096 Ko |
+| Cache L3 | non exposé (Apple Silicon utilise un SLC système, pas de L3 classique) |
+| RAM | 24 Go |
+| OS | macOS 27.0 (build 26A428) |
+| Runtime | go1.26.4 darwin/arm64, CGO_ENABLED=0 |
 
 ## Protocole
 
@@ -42,8 +42,8 @@ Paramètres :
   physiquement impossible. Voir la note de métrologie dans
   [`01-profiling.md`](01-profiling.md).
 - **Isolation du bruit** : applications fermées, machine sur secteur, plan
-  d'alimentation relevé (`powercfg /getactivescheme`), `-trimpath` à la
-  compilation. La variance résiduelle est rapportée, jamais masquée.
+  d'alimentation relevé (`pmset -g`), `-trimpath` à la compilation. La
+  variance résiduelle est rapportée, jamais masquée.
 - **Significativité** : `benchstat` seul décide. Une exécution unique est une
   anecdote, pas une mesure.
 
@@ -62,32 +62,38 @@ Scénario `medium` : grille 128×128, 400 fourmis, 400 ticks, graine 20260921.
 
 | Mesure | Valeur |
 |---|---|
-| Temps mur | **6,451 s ± 1 %** |
-| Débit | **61,5 ticks/s** |
-| Allocations | **66,23 M allocs/op** |
-| Mémoire allouée | **399,1 Mio/op** |
-| Nourriture collectée | 203 |
-| Checksum | `0xd8184bf93c56fa26` |
+| Temps mur | **4,128 s ± 1 %** |
+| Débit | **96,03 ticks/s ± 2 %** |
+| Allocations | **66,30 M allocs/op** |
+| Mémoire allouée | **397,8 Mio/op** |
+| Nourriture collectée | 288 |
+| Checksum | `0xa6b0a8c6451d55e4` |
 
-Scénario `small` : 64×64, 120 fourmis, 200 ticks → **799,3 ms ± 1 %**,
-8,244 M allocs/op, 41,60 Mio/op.
+Scénario `small` : 64×64, 120 fourmis, 200 ticks → **490,0 ms ± 5 %**,
+8,266 M allocs/op, 41,49 Mio/op, nourriture collectée 127,
+checksum `0x3bd2e12c9b6e9b22`.
 
-Source : `bench/results/baseline.txt` (`-count 6`, médianes `benchstat`).
+Source : `bench/results/baseline.txt` (`-count 6`, médianes `benchstat`) pour
+les temps/allocations ; `./bin/antsim.exe -config … -engine naive` (sortie
+JSON directe) pour la nourriture et le checksum, qui ne sont pas dans
+`testing.B`.
 
-### Scalabilité (`-cpu 1,2,6,12`)
+### Scalabilité (`-cpu 1,2,4,8,12`)
 
-| GOMAXPROCS | ns/op |
+| GOMAXPROCS | sec/op |
 |---|---|
-| 1 | 846 663 800 |
-| 2 | 790 215 033 |
-| 6 | 806 784 867 |
-| 12 | 803 521 567 |
+| 1 | 566,4m ± 2 % |
+| 2 | 512,6m ± 1 % |
+| 4 | 511,9m ± 1 % |
+| 8 | 513,6m ± 2 % |
+| 12 | 505,3m ± 3 % |
 
-**Courbe plate** — écart total de 7 % entre 1 et 12 cœurs, sans tendance.
-C'est le résultat attendu et il est utile : il établit formellement que v0 est
-mono-thread. C'est la référence contre laquelle
-l'étage v4 (worker pool) sera mesuré. Les écarts observés sont du bruit
-d'ordonnancement, pas du parallélisme.
+**Courbe plate** — 566 → 505 ms, moins de 12 % d'écart total, sans tendance
+monotone au-delà du bruit. C'est le résultat attendu et il est utile : il
+établit formellement que v0 est mono-thread, quel que soit `GOMAXPROCS`.
+C'est la référence contre laquelle l'étage v4 (worker pool, 12 cœurs
+physiques) sera mesuré. Source :
+[`scaling_2026-09-22_164722.txt`](../../bench/results/scaling_2026-09-22_164722.txt).
 
 ## Ce que la baseline est délibérément
 
@@ -101,7 +107,7 @@ préparer un levier du cours :
 | Champs `int64`, deux `bool` intercalés (~96 o) | alignement + `int32`/`uint8` |
 | `Trail []string` en `append` à chaque tick | suppression, pression GC |
 | Allocations par tick | tampons préalloués, zéro-allocation |
-| Boucle de tick mono-thread | worker pool sur 6 cœurs physiques |
+| Boucle de tick mono-thread | worker pool sur 12 cœurs physiques |
 
 Ce qu'elle n'est **pas**, c'est incorrecte : PRNG par fourmi, virgule fixe,
 double tampon et phases séparées sont présents dès v0, car ce sont précisément

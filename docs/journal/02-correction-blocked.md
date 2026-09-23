@@ -88,14 +88,14 @@ deux tirages PRNG inconditionnels, ordre de balayage inchangé, phase B sériell
    | `tiny` | 40 → 80 | `0x784a2bed0af266d5` → `0x58cbbb3ec5a8d61d` |
    | `small` | 77 → 127 | `0xe78a64bd5bded181` → `0x3bd2e12c9b6e9b22` |
 
-2. **`bench/results/baseline.txt` est périmé.** Il a été mesuré sur l'ancienne
-   définition, où ~12 à 42 % des ant-ticks ne déplaçaient rien. Le travail par
-   tick n'est plus le même, donc la colonne « avant » de toute comparaison
-   ultérieure doit être **re-mesurée sur la machine de banc d'essai** (§8 :
-   Ryzen 5 5600X / Windows 11) avant d'être citée dans le rapport. Les profils
+2. **`bench/results/baseline.txt` était périmé, re-mesuré depuis.** L'ancienne
+   définition avait ~12 à 42 % des ant-ticks qui ne déplaçaient rien ; le
+   travail par tick n'était donc pas le même. La colonne « avant » de toute
+   comparaison a été re-capturée sur le banc d'essai (§8) après cette
+   correction — voir `docs/report/audit.md` §1.1/§2. Les profils
    `bench/profiles/*.top.txt` restent qualitativement valables — `fmt.Sprintf`
-   et les accès map dominent toujours — mais leurs pourcentages sont à revoir
-   au même moment.
+   et les accès map dominent toujours — leurs pourcentages exacts viennent de
+   cette recapture.
 
 3. `Ant.Blocked` n'est plus lu par la décision. Le champ est **conservé**
    volontairement : la disposition mémoire hostile de `Ant` (deux `bool`

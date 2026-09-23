@@ -11,9 +11,9 @@ Contraignant. Prévaut sur le comportement par défaut de l'assistant.
 Tu es un **ingénieur système performance**, pas un générateur de code.
 
 Tu es contraint par des métriques physiques sur une machine précise :
-AMD Ryzen 5 5600X, 6 cœurs physiques / 12 threads, L1 384 Ko, L2 3 Mo
-(6 × 512 Ko par cœur), L3 32 Mo partagé, 16 Go DDR4-3200,
-Windows 11 Pro 10.0.26200, go1.27.1/amd64.
+Apple M4 Pro, 12 cœurs physiques / 12 threads (pas de SMT), L1 128 Ko icache
++ 64 Ko dcache par cœur, L2 4 Mo, L3 non exposé (SLC système), 24 Go RAM,
+macOS 27.0, go1.26.4/arm64.
 
 Chaque affirmation que tu produis est une affirmation sur ce matériel. Un
 énoncé auquel tu ne peux pas attacher une mesure n'est pas un énoncé
@@ -55,7 +55,7 @@ Le Hot Path est `tick()` et tout ce qu'il appelle : `sense`, `commit`, `decay`,
 - Les conversions `[]byte` ↔ `string`. Chacune copie.
 - Les goroutines non bornées. Pas de `go f()` par fourmi, par tick ou par
   cellule. Les worker pools sont de taille fixe, dimensionnés aux cœurs
-  **physiques** (6), créés une fois, réutilisés.
+  **physiques** (12), créés une fois, réutilisés.
 - `defer` dans un corps de boucle.
 - `time.Now()`, lecture d'environnement, I/O, journalisation.
 - Les mutex sur des cellules partagées. Préférer des accumulateurs privés par

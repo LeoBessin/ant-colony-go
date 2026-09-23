@@ -198,19 +198,34 @@ Aucun étage d'optimisation n'existe encore : seuls `naive` (la baseline) et
 ci-dessous représente une séance de cours, réalisée profilage en main. Ne pas
 les construire avant le profilage qui les justifie.
 
+**Le barème note le cheminement, pas le nombre d'étages.** §3 exige 3 axes
+(mémoire/localité, concurrence, I/O) et §4 un échec constructif — soit
+**4 moteurs suffisent** si chacun est mesuré et expliqué correctement. Ajouter
+des étages optionnels sans les documenter au même niveau de rigueur dilue la
+note ; un chemin court et bien prouvé vaut mieux qu'une collection.
+
+**Chemin retenu (couvre les 4 axes notés) :**
+
 | Étage | Package | Changement | Axe du barème |
 |---|---|---|---|
 | v0 | `naive` | baseline | — |
 | v1 | `flatgrid` | maps à clé chaîne → `[]uint32` plat, `idx = y*W+x` | 3a mémoire & localité |
+| v4 | `parallel` | worker pool dimensionné aux **12 cœurs physiques** (banc actuel, §8), phases A et C en bandes de lignes — construit sur v1, la map interdit tout découpage propre | 3b concurrence |
+| F1 | `failsharing` | **échec constructif planifié**, construit sur v4 : compteurs par worker non rembourrés partageant une ligne de 64 o, puis le rembourrage `[64]byte` qui corrige — publier les deux chiffres | §4, lignes de cache 64 o |
+| v6 | `codec` | gob/protobuf vs JSON pour Result et le flux de snapshots ; éventuellement journal SQLite + index + `EXPLAIN QUERY PLAN` | 3c I/O |
+
+**Optionnels — seulement si le chemin retenu est fini et prouvé avant la
+deadline :**
+
+| Étage | Package | Changement | Axe du barème |
+|---|---|---|---|
 | v2 | `soa` | `[]*Ant` → `[]Ant` → SoA ; alignement des champs, `int32`/`uint8` | 3a, ligne de cache 64 o |
 | v3 | `nogc` | tampons préalloués, suppression de `Ant.Trail`, `sync.Pool` pour les snapshots ; assertion `allocs/op == 0` | 3a / 3c |
-| v4 | `parallel` | worker pool dimensionné aux **6 cœurs physiques**, phases A et C en bandes de lignes | 3b concurrence |
 | v5 | `tuned` | compteurs atomiques, arrêt précoce, taille de bande calée sur L2 | 3b |
-| v6 | `codec` | gob/protobuf vs JSON pour Result et le flux de snapshots ; éventuellement journal SQLite + index + `EXPLAIN QUERY PLAN` | 3c I/O |
-| F1 | `failsharing` | **échec constructif planifié** : compteurs par worker non rembourrés partageant une ligne de 64 o, puis le rembourrage `[64]byte` qui corrige — publier les deux chiffres | §4 |
 
-F1 est l'entrée §4 recommandée : mesurable, explicable mécaniquement, et
-directement reliée au contenu « lignes de cache 64 octets » du cours.
+Chaque étage, retenu ou optionnel, suit exactement la procédure §5 (profiler
+d'abord, un seul changement, `make test` avant de publier un chiffre) et le
+gabarit de rédaction en tête de `docs/report/audit.md` §3.
 
 ---
 
@@ -241,13 +256,14 @@ l'ancien.
 
 ### Prérequis
 
-Go 1.23+ requis (construit et mesuré sur **1.27.1**). Les outils optionnels
-dégradent en étape ignorée avec un avertissement, jamais en échec :
+Go 1.23+ requis (construit et mesuré sur **go1.26.4 darwin/arm64**). Les
+outils optionnels dégradent en étape ignorée avec un avertissement, jamais en
+échec :
 
 ```bash
-winget install sharkdp.hyperfine                          # temps du binaire complet
+brew install hyperfine                                    # temps du binaire complet
 go install golang.org/x/perf/cmd/benchstat@latest         # comparaison statistique
-winget install Graphviz.Graphviz                          # callgraphs pprof -svg
+brew install graphviz                                      # callgraphs pprof -svg
 ```
 
 ---
@@ -276,14 +292,17 @@ winget install Graphviz.Graphviz                          # callgraphs pprof -sv
 
 ## 8. Banc d'essai
 
-Toutes les mesures de ce dépôt ont été prises sur :
+Toutes les mesures de ce dépôt sont prises sur :
 
 ```
-AMD Ryzen 5 5600X — 6 cœurs physiques / 12 threads, 3,7 GHz de base
-L1 384 Ko · L2 3 Mo (6 × 512 Ko, privé par cœur) · L3 32 Mo (partagé)
-16 Go DDR4-3200
-Windows 11 Pro 10.0.26200 · go1.27.1 windows/amd64
+Apple M4 Pro — 12 cœurs physiques / 12 threads (pas de SMT)
+L1 128 Ko icache + 64 Ko dcache (par cœur) · L2 4 Mo · L3 non exposé (SLC système)
+24 Go RAM
+macOS 27.0 (26A428) · go1.26.4 darwin/arm64
 ```
+
+`bench/results/baseline.txt` est pinné sur cette machine : un moteur ne se
+compare qu'à un autre moteur mesuré ici, jamais à un chiffre pris ailleurs.
 
 Les tailles de scénario sont choisies en regard de cette hiérarchie. Une fois
 l'étage v1 la grille devenue un `[]uint32` plat, une grille coûte

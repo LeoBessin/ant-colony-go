@@ -45,7 +45,7 @@ func load(b *testing.B, name string) config.Config {
 // paying off visibly, and the report should say so.
 var benchScenarios = []string{"small", "medium"}
 
-// BenchmarkEngine is the primary comparison: every registered engine against
+// 	Engine is the primary comparison: every registered engine against
 // every scenario, so v0 and every later stage appear in one benchstat table.
 func BenchmarkEngine(b *testing.B) {
 	for _, sc := range benchScenarios {
