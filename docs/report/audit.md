@@ -4,9 +4,11 @@
 Auteur : Leo Bessin · Langage : Go · Session E42
 
 > **État : en cours.** Sections 1, 2 et 5 renseignées. Section 3 : v1
-> `flatgrid` mesuré et rédigé ; v4/F1/v6 restent à construire (chemin retenu,
-> §3). Section 4 : F1 planifié, pas encore construit. Une entrée
-> `docs/journal/` par levier.
+> `flatgrid` mesuré et rédigé ; v4 `parallel` et v3 `nogc` construits et
+> validés (`make test`), **chiffres en attente de mesure sur le banc §1.1**
+> (brouillons mesurés hors banc dans `docs/journal/06` et `07`) ; F1/v6
+> restent à construire. Section 4 : F1 planifié, pas encore construit. Une
+> entrée `docs/journal/` par levier.
 >
 > Les tableaux générés automatiquement sont dans
 > `docs/report/generated-tables.md` (`make report`). Ne pas les recopier à la
@@ -61,7 +63,7 @@ Capture automatique et horodatée : `make env` → `docs/env/` (dernière captur
 | Instrument | Question à laquelle il répond |
 |---|---|
 | `go test -bench` | Quelle instruction / allocation a diminué ? (`ns/op`, `B/op`, `allocs/op`, courbe `-cpu`) |
-| `hyperfine` | Qu'attend réellement l'opérateur ? (process complet, moyenne / médiane / écart-type) |s
+| `hyperfine` | Qu'attend réellement l'opérateur ? (process complet, moyenne / médiane / écart-type) |
 
 ### 1.3 Dimensionnement des scénarios vis-à-vis des caches
 
@@ -318,12 +320,25 @@ La ligne v0 → v1, remplie — entrée complète :
 - [x] v1 `flatgrid` — `map[string]T` → `[]T`, `idx = y*W+x`. **≈106× sur
       `Engine/medium`, allocs/op ÷401, checksum identique.** Détail :
       [`docs/journal/04-flatgrid.md`](../journal/04-flatgrid.md).
+- [x] v3 `nogc` — suppression de `Ant.Trail` (historique `[]string` jamais
+      lu, alimenté à chaque tick). Construit sur v4 et non sur v2 : c'est le
+      profil de v4 qui l'a justifié (99 % des octets alloués, `commit` série
+      ≈ 36 % du temps mural). Allocations par `Run` devenues constantes
+      (`TestNogcAllocationsDoNotGrowWithTicks`), checksum identique.
+      **Chiffres du banc §1.1 : en attente.** Brouillon hors banc :
+      [`docs/journal/07-nogc.md`](../journal/07-nogc.md).
 - [ ] _(optionnel)_ v2 `soa` — `[]*Ant` → AoS → SoA ; alignement des champs, `int32`/`uint8`
 
 ### 3.2 Concurrence & scalabilité CPU
 
-- [ ] v4 `parallel` — worker pool dimensionné aux 12 cœurs **physiques**
-      (§1.1), phases A et C découpées en bandes de lignes — construit sur v1
+- [x] v4 `parallel` — worker pool fixe, phases A (fourmis) et C (lignes)
+      découpées en plages d'indices fixes, un canal par worker (pas de vol de
+      travail), phase B série. Construit sur v1. Pool dimensionné sur
+      `GOMAXPROCS` (12 sur le banc §1.1), pour que `-cpu 1,2,4,8,12` trace la
+      courbe de scalabilité sans changer le code. Checksum identique pour
+      1, 2, 3, 7 et 16 workers (`TestParallelIndependentOfWorkerCount`),
+      `go test -race` propre. **Chiffres du banc §1.1 : en attente.**
+      Brouillon hors banc : [`docs/journal/06-parallel.md`](../journal/06-parallel.md).
 - [ ] _(optionnel)_ v5 `tuned` — compteurs atomiques, arrêt précoce, taille de bande calée sur L2
 
 Référence — reproduction :
@@ -415,7 +430,8 @@ vides = étage pas encore construit (voir chemin retenu, §3).
 |---|---|---:|---:|---|---|
 | **v0** | `naive` — `map[string]uint32` + clé `fmt.Sprintf`, `[]*Ant` | **4,029 s ± 1 %** | **66,30 M** | plate, 566→505 ms (mono-thread confirmé) | **Baseline.** Goulot identifié : `key()` = 56,41 % du CPU sur une seule ligne (§2.1). |
 | **v1** | `flatgrid` — `map[string]T` → `[]T`, `idx=y*W+x` (8 champs) | **37,88 ms ± 1 %** | **165 315** | non testé (v4 découpe en bandes, pas cet étage) | **Retenu : ≈106× sur `Engine/medium`, allocs ÷401, checksum identique à naive.** Dépasse la borne Amdahl (≈4×) — voir [journal](../journal/04-flatgrid.md) : la borne ignorait la pression GC causée par les mêmes allocations. Hot path suivant : `decayGrid`/`level` (bande passante mémoire), comme prédit. |
-| v4 | `parallel` — worker pool 12 cœurs, construit sur v1 | — | — | — | _Prochain étage : v1 est mesuré, la grille plate permet enfin un découpage en bandes propre._ |
+| v4 | `parallel` — worker pool `GOMAXPROCS`, phases A et C en plages fixes, construit sur v1 | _en attente (banc §1.1)_ | _en attente_ | _en attente_ | _Construit, `make test` OK. Hors banc : ≈2,6× sur `large` à 16 threads ; plafond = phase B série ([journal](../journal/06-parallel.md))._ |
+| v3 | `nogc` — suppression de `Ant.Trail`, construit sur v4 | _en attente (banc §1.1)_ | _en attente_ | _en attente_ | _Construit, `make test` OK. Hors banc : allocations constantes par `Run`, ≈1,6× sur v4 à 16 threads, gain plus fort en parallèle qu'en série ([journal](../journal/07-nogc.md))._ |
 | F1 | `failsharing` — faux partage puis rembourrage `[64]byte` | — | — | — | _Échec constructif planifié (§4) : deux chiffres à publier, pas un._ |
 | v6 | `codec` — gob/Protobuf vs JSON | — | — | — | _À construire, indépendant du reste._ |
 
