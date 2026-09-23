@@ -3,9 +3,10 @@
 **Sup de Vinci — RNCP Bloc 4 · Optimisations & Performances Backend**
 Auteur : Leo Bessin · Langage : Go · Session E42
 
-> **État : squelette.** Les sections 1 et 2 sont renseignées avec les mesures
-> réelles de la séance 1. Les sections 3 à 5 se remplissent au fil du cours,
-> une entrée de `docs/journal/` par levier.
+> **État : en cours.** Sections 1, 2 et 5 renseignées. Section 3 : v1
+> `flatgrid` mesuré et rédigé ; v4/F1/v6 restent à construire (chemin retenu,
+> §3). Section 4 : F1 planifié, pas encore construit. Une entrée
+> `docs/journal/` par levier.
 >
 > Les tableaux générés automatiquement sont dans
 > `docs/report/generated-tables.md` (`make report`). Ne pas les recopier à la
@@ -187,8 +188,15 @@ clé chaîne (`strconv` + accès map pur : 20,4 + 10,7 = 31,2 ns) resterait à
 `Sprintf` (55,13 %) + `mapaccess1_faststr` (19,74 %) ≈ **74,9 %** du temps CPU
 cumulé ⇒ le gain maximal atteignable en les supprimant est borné à ≈ **4,0×**
 sur cette fraction (`1 / (1 − 0,749)`), avant apparition du goulot suivant
-(bande passante mémoire de `decayGrid`, ou pression GC). Cette borne est à
-confronter au gain réellement obtenu en v1.
+(bande passante mémoire de `decayGrid`, ou pression GC).
+
+> **Vérifié en v1 (§3) : le gain réel est ≈ 106×, pas ≈ 4×.** La borne
+> ci-dessus ne comptait que la fraction CPU d'un seul échantillon ; elle
+> traitait le reste du profil comme un temps fixe alors qu'une bonne partie
+> (`mallocgcTiny`, `madvise`, `sync.Pool.Get/Put`) était elle-même causée par
+> les mêmes 66 M allocations. Une borne d'Amdahl sur un profil échantillonné
+> est un minorant, pas une prédiction — détail et explication mécanique dans
+> [`docs/journal/04-flatgrid.md`](../journal/04-flatgrid.md).
 
 ---
 
@@ -217,38 +225,51 @@ comparable d'un étage à l'autre :
 4. **Commande** — la commande exacte relancée pour produire ces chiffres,
    copiable telle quelle (`go test -bench …`, `benchstat …`, `hyperfine …`).
 
-La ligne v0 → v1 de ce gabarit, remplie avec les chiffres déjà mesurés :
+La ligne v0 → v1, remplie — entrée complète :
+[`docs/journal/04-flatgrid.md`](../journal/04-flatgrid.md).
 
 > **1. Optimisation appliquée.** Hypothèse (§2.3) : `fmt.Sprintf` +
 > `mapaccess1_faststr` ≈ 74,9 % du CPU cumulé, donc les remplacer par un
-> index plat borne le gain à ≈ 4,0×. Changement unique : les quatre
-> `map[string]uint32` (grille, deux champs de phéromones, murs) deviennent
-> des `[]uint32` indexés `idx = y*W+x`. Fichier :
-> `internal/engine/flatgrid/world.go`.
+> index plat devrait au moins tripler la vitesse. Changement unique : les 8
+> `map[string]T` du `World` (`Walls`, `Food`, `PheroFood`, `PheroHome`,
+> `depFood`, `depHome`, `nextFood`, `nextHome`) deviennent des `[]T` indexés
+> `idx(x,y) = y*W+x`. Tout le reste — PRNG, virgule fixe, double tampon,
+> `Ant` non alignée, `[]*Ant` — copié verbatim de `naive` (leviers de v2/v3).
+> Fichiers : `internal/engine/flatgrid/{flatgrid,tick,output}.go`.
 >
-> **2. Métriques de référence (v0, §2.2/§5.3).** `Engine/medium` : 4,128 s
-> ± 1 %, 397,8 Mi, 66,30 M allocs/op. `GridLookupMap` : 56,00 ns, 6 B/op,
-> 1 alloc/op.
+> **2. Métriques de référence (v0).** `Engine/medium` : 4,029 s ± 1 %,
+> 397,8 Mi, 66,30 M allocs/op. `TickRate` : 96,47 ticks/s. Checksum
+> `medium` : `0xa6b0a8c6451d55e4`.
 >
-> **3. Comparatif benchmark.** _À remplir une fois `flatgrid` construit et
-> passé au golden test (`make test`)._
+> **3. Comparatif benchmark** (`-count 6`, médianes) :
 >
-> | Métrique | v0 `naive` | v1 `flatgrid` | Δ (`benchstat`) |
-> |---|---:|---:|---|
-> | `Engine/medium` — sec/op | 4,128 ± 1 % | — | — |
-> | `Engine/medium` — allocs/op | 66,30 M | — | — |
-> | `GridLookupFlat` — ns/op | — (réf. `GridLookupMap` 56,00) | 0,3245 | déjà mesuré isolément, §2.2 |
+> | Métrique | v0 `naive` | v1 `flatgrid` | Gain |
+> |---|---:|---:|---:|
+> | `Engine/medium` sec/op | 4,029 s ± 1 % | **37,88 ms ± 1 %** | **≈ 106×** |
+> | `allocs/op` | 66 302 084 | **165 315** | **≈ 401×** |
+> | `B/op` | 417 160 573 | **8 990 112** | **≈ 46×** |
+> | `TickRate` ticks/s | 96,47 | **≈ 9 944** | **≈ 103×** |
+> | Binaire complet (hyperfine) | 4,060 s ± 0,096 s | **43,2 ms ± 0,8 ms** | **94,07× ± 2,83** |
+> | Checksum | `0xa6b0a8c6451d55e4` | `0xa6b0a8c6451d55e4` | **identique** |
+>
+> **`make test` : PASS**, checksum identique — l'invariant de correction
+> tient. Le gain (≈106×) dépasse largement la borne d'Amdahl (§2.3) : voir
+> le journal pour l'explication (la borne ignorait la pression GC causée par
+> les mêmes allocations qu'elle ne comptait pas).
 >
 > **4. Commande.**
 > ```bash
 > go test -run '^$' -bench '^Benchmark(Engine|TickRate)' -benchmem \
 >     -benchtime 3x -count 6 ./bench/...
-> benchstat bench/results/baseline.txt bench/results/latest.txt
+> hyperfine --warmup 3 --runs 10 -L engine naive,flatgrid \
+>     "./bin/antsim.exe -quiet -config internal/config/scenarios/medium.json -engine {engine}"
 > ```
 
 ### 3.1 Mémoire & localité de cache
 
-- [ ] v1 `flatgrid` — `map[string]uint32` → `[]uint32`, `idx = y*W+x`
+- [x] v1 `flatgrid` — `map[string]T` → `[]T`, `idx = y*W+x`. **≈106× sur
+      `Engine/medium`, allocs/op ÷401, checksum identique.** Détail :
+      [`docs/journal/04-flatgrid.md`](../journal/04-flatgrid.md).
 - [ ] _(optionnel)_ v2 `soa` — `[]*Ant` → AoS → SoA ; alignement des champs, `int32`/`uint8`
 - [ ] _(optionnel)_ v3 `nogc` — tampons préalloués, suppression de `Ant.Trail`, zéro allocation
 
@@ -344,9 +365,9 @@ vides = étage pas encore construit (voir chemin retenu, §3).
 
 | Étage | Approche | `Engine/medium` sec/op | Allocs/op | Concurrence (`-cpu 1→12`) | Conclusion |
 |---|---|---:|---:|---|---|
-| **v0** | `naive` — `map[string]uint32` + clé `fmt.Sprintf`, `[]*Ant` | **4,128 s ± 1 %** | **66,30 M** | plate, 566→505 ms (mono-thread confirmé) | **Baseline.** Goulot identifié : `key()` = 56,41 % du CPU sur une seule ligne (§2.1). |
-| v1 | `flatgrid` — `[]uint32` indexé `y*W+x` | — | — | — | _À construire. Hypothèse : allocs/op → ~0, borne Amdahl ≈ 4,0× (§2.3)._ |
-| v4 | `parallel` — worker pool 12 cœurs, construit sur v1 | — | — | — | _À construire une fois v1 mesuré._ |
+| **v0** | `naive` — `map[string]uint32` + clé `fmt.Sprintf`, `[]*Ant` | **4,029 s ± 1 %** | **66,30 M** | plate, 566→505 ms (mono-thread confirmé) | **Baseline.** Goulot identifié : `key()` = 56,41 % du CPU sur une seule ligne (§2.1). |
+| **v1** | `flatgrid` — `map[string]T` → `[]T`, `idx=y*W+x` (8 champs) | **37,88 ms ± 1 %** | **165 315** | non testé (v4 découpe en bandes, pas cet étage) | **Retenu : ≈106× sur `Engine/medium`, allocs ÷401, checksum identique à naive.** Dépasse la borne Amdahl (≈4×) — voir [journal](../journal/04-flatgrid.md) : la borne ignorait la pression GC causée par les mêmes allocations. Hot path suivant : `decayGrid`/`level` (bande passante mémoire), comme prédit. |
+| v4 | `parallel` — worker pool 12 cœurs, construit sur v1 | — | — | — | _Prochain étage : v1 est mesuré, la grille plate permet enfin un découpage en bandes propre._ |
 | F1 | `failsharing` — faux partage puis rembourrage `[64]byte` | — | — | — | _Échec constructif planifié (§4) : deux chiffres à publier, pas un._ |
 | v6 | `codec` — gob/Protobuf vs JSON | — | — | — | _À construire, indépendant du reste._ |
 
