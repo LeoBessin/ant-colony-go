@@ -37,7 +37,7 @@ plt.rcParams.update({
 
 # ============================================================== CHART 2 ======
 # Before/after wall-clock time, log scale, medium scenario, both optimizations.
-fig, ax = plt.subplots(figsize=(7.5, 3.6), dpi=200)
+fig, ax = plt.subplots(figsize=(5.6, 2.7), dpi=150)
 
 rows = [
     ("Module principal — avant", 4100, BLUE),
@@ -84,7 +84,7 @@ plt.close(fig)
 
 # ============================================================== CHART 3 ======
 # Before/after allocation count, log scale, medium scenario, both modules.
-fig, ax = plt.subplots(figsize=(7.5, 3.6), dpi=200)
+fig, ax = plt.subplots(figsize=(5.6, 2.7), dpi=150)
 
 rows3 = [
     ("Module principal — avant", 66_302_084, BLUE),
@@ -129,7 +129,7 @@ plt.close(fig)
 # Full picture: all 4 registered engines, medium scenario, sec/op, log scale.
 # Included for completeness (annex) -- gradient is a separate feature variant,
 # not one of the two optimizations this report covers, shown here as-is.
-fig, ax = plt.subplots(figsize=(8.3, 2.8), dpi=200)
+fig, ax = plt.subplots(figsize=(6.2, 2.1), dpi=150)
 
 rows4 = [
     ("naive (module principal, non corrigé)", 4100, BLUE),

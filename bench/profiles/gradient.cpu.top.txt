@@ -1,33 +1,33 @@
 File: antsim.exe
 Type: cpu
-Time: 2026-09-23 19:49:51 CEST
-Duration: 4.24s, Total samples = 3800ms (89.68%)
-Showing nodes accounting for 3280ms, 86.32% of 3800ms total
-Dropped 52 nodes (cum <= 19ms)
-Showing top 25 nodes out of 96
+Time: 2026-09-24 13:44:44 CEST
+Duration: 4.14s, Total samples = 3570ms (86.22%)
+Showing nodes accounting for 3120ms, 87.39% of 3570ms total
+Dropped 35 nodes (cum <= 17.85ms)
+Showing top 25 nodes out of 105
       flat  flat%   sum%        cum   cum%
-     510ms 13.42% 13.42%      750ms 19.74%  fmt.(*fmt).fmtInteger
-     310ms  8.16% 21.58%     1210ms 31.84%  fmt.(*pp).doPrintf
-     270ms  7.11% 28.68%      270ms  7.11%  runtime.madvise
-     270ms  7.11% 35.79%      700ms 18.42%  runtime.mapaccess1_faststr
-     240ms  6.32% 42.11%      270ms  7.11%  runtime.mallocgcTiny
-     220ms  5.79% 47.89%      220ms  5.79%  runtime.pthread_cond_signal
-     180ms  4.74% 52.63%      180ms  4.74%  runtime.memmove
-     140ms  3.68% 56.32%      140ms  3.68%  aeshashbody
-     100ms  2.63% 58.95%      240ms  6.32%  fmt.(*fmt).pad
-     100ms  2.63% 61.58%      390ms 10.26%  runtime.mallocgc
-      80ms  2.11% 63.68%       80ms  2.11%  internal/runtime/maps.(*groupReference).key (inline)
-      80ms  2.11% 65.79%       80ms  2.11%  internal/runtime/maps.probeSeq.next (inline)
-      80ms  2.11% 67.89%       80ms  2.11%  runtime.pthread_cond_wait
-      80ms  2.11% 70.00%       80ms  2.11%  runtime.pthread_kill
-      70ms  1.84% 71.84%      870ms 22.89%  fmt.(*pp).printArg
-      70ms  1.84% 73.68%      120ms  3.16%  sync.(*Pool).pin
-      60ms  1.58% 75.26%     2090ms 55.00%  fmt.Sprintf
-      60ms  1.58% 76.84%      200ms  5.26%  fmt.newPrinter
-      60ms  1.58% 78.42%       60ms  1.58%  runtime.convT64
-      60ms  1.58% 80.00%      140ms  3.68%  sync.(*Pool).Get
-      50ms  1.32% 81.32%      800ms 21.05%  fmt.(*pp).fmtInteger
-      50ms  1.32% 82.63%       50ms  1.32%  internal/runtime/maps.ctrlGroupMatchEmpty (inline)
-      50ms  1.32% 83.95%       50ms  1.32%  runtime.procPin (inline)
-      50ms  1.32% 85.26%      480ms 12.63%  runtime.slicebytetostring
-      40ms  1.05% 86.32%      140ms  3.68%  fmt.(*buffer).write (inline)
+     410ms 11.48% 11.48%      670ms 18.77%  fmt.(*fmt).fmtInteger
+     300ms  8.40% 19.89%     1250ms 35.01%  fmt.(*pp).doPrintf
+     270ms  7.56% 27.45%      690ms 19.33%  runtime.mapaccess1_faststr
+     210ms  5.88% 33.33%      210ms  5.88%  runtime.madvise
+     210ms  5.88% 39.22%      330ms  9.24%  runtime.mallocgcTiny
+     190ms  5.32% 44.54%      190ms  5.32%  runtime.memmove
+     170ms  4.76% 49.30%      170ms  4.76%  runtime.pthread_cond_signal
+     140ms  3.92% 53.22%      260ms  7.28%  fmt.(*fmt).pad
+     130ms  3.64% 56.86%      880ms 24.65%  fmt.(*pp).printArg
+     110ms  3.08% 59.94%      110ms  3.08%  aeshashbody
+      90ms  2.52% 62.46%       90ms  2.52%  runtime.kevent
+      80ms  2.24% 64.71%      750ms 21.01%  fmt.(*pp).fmtInteger
+      80ms  2.24% 66.95%       80ms  2.24%  internal/runtime/maps.(*groupReference).key (inline)
+      80ms  2.24% 69.19%       80ms  2.24%  internal/runtime/maps.probeSeq.next (inline)
+      80ms  2.24% 71.43%       80ms  2.24%  runtime.convT64
+      80ms  2.24% 73.67%       80ms  2.24%  runtime.pthread_cond_wait
+      80ms  2.24% 75.91%      520ms 14.57%  runtime.slicebytetostring
+      60ms  1.68% 77.59%       60ms  1.68%  internal/runtime/maps.ctrlGroupMatchEmpty (inline)
+      60ms  1.68% 79.27%      410ms 11.48%  runtime.mallocgc
+      60ms  1.68% 80.95%       60ms  1.68%  runtime.pthread_kill
+      50ms  1.40% 82.35%      110ms  3.08%  fmt.newPrinter
+      50ms  1.40% 83.75%       50ms  1.40%  internal/runtime/maps.h2 (inline)
+      50ms  1.40% 85.15%       50ms  1.40%  runtime.tryDeferToSpanScan
+      40ms  1.12% 86.27%       40ms  1.12%  runtime.procPin (inline)
+      40ms  1.12% 87.39%       90ms  2.52%  sync.(*Pool).pin

@@ -40,7 +40,7 @@ def load(path):
 t_par, rss_par = load("/tmp/rss_parallel.txt")
 t_nogc, rss_nogc = load("/tmp/rss_nogc.txt")
 
-fig, ax = plt.subplots(figsize=(7.5, 4.2), dpi=200)
+fig, ax = plt.subplots(figsize=(5.6, 3.15), dpi=150)
 
 ax.plot(t_par, rss_par, color=BLUE, linewidth=2, zorder=3,
         label="parallel (avant correction)")

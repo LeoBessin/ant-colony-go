@@ -4,39 +4,47 @@ pkg: antcolony/bench
 cpu: Apple M4 Pro
                           │ bench/results/baseline.txt │      bench/results/latest.txt       │
                           │           sec/op           │    sec/op      vs base              │
-Engine/small/naive-12                      490.0m ± 5%    475.9m ±  1%  -2.88% (p=0.002 n=6)
-Engine/medium/naive-12                      4.128 ± 1%     4.100 ±  1%       ~ (p=0.180 n=6)
-TickRate/naive-12                           4.166 ± 2%     4.108 ±  1%  -1.37% (p=0.015 n=6)
-Scaling/naive-12                           505.6m ± 1%    504.0m ±  2%       ~ (p=0.699 n=6)
-KeySprintf-12                              45.29n ± 3%    44.22n ±  1%       ~ (p=0.065 n=8)
-KeyStrconv-12                              20.45n ± 1%    20.16n ±  1%  -1.44% (p=0.004 n=8)
-KeyFlatIndex-12                           0.3161n ± 2%   0.3255n ±  1%  +2.94% (p=0.000 n=8)
-GridLookupMap-12                           56.00n ± 1%    55.06n ±  1%  -1.66% (p=0.000 n=8)
-GridLookupFlat-12                         0.3245n ± 1%   0.3218n ±  0%  -0.83% (p=0.001 n=8)
-RngXoshiro-12                              2.694n ± 1%    2.655n ±  0%  -1.43% (p=0.000 n=8)
-RngXoshiroIntn-12                          2.889n ± 0%    2.870n ±  0%  -0.67% (p=0.002 n=8)
-RngMathRandLocal-12                        2.830n ± 0%    2.856n ±  0%  +0.92% (p=0.010 n=8)
-RngMathRandGlobal-12                       5.864n ± 1%    5.845n ±  0%       ~ (p=0.098 n=8)
-Engine/small/flatgrid-12                                  5.384m ± 52%
-Engine/small/gradient-12                                  473.8m ±  1%
-Engine/small/scent-12                                     5.600m ±  1%
-Engine/medium/flatgrid-12                                 39.25m ±  2%
-Engine/medium/gradient-12                                  3.872 ±  2%
-Engine/medium/scent-12                                    42.26m ±  1%
-TickRate/flatgrid-12                                      40.62m ± 19%
-TickRate/gradient-12                                       3.961 ±  2%
-TickRate/scent-12                                         42.22m ±  3%
-Scaling/flatgrid-12                                       5.439m ±  1%
-Scaling/gradient-12                                       502.4m ±  2%
-Scaling/scent-12                                          5.937m ±  1%
-geomean                                    1.848µ         286.5µ        -0.79%
+Engine/small/naive-12                      490.0m ± 5%    490.6m ±  1%       ~ (p=0.937 n=6)
+Engine/medium/naive-12                      4.128 ± 1%     4.107 ±  0%       ~ (p=0.485 n=6)
+TickRate/naive-12                           4.166 ± 2%     4.143 ±  1%       ~ (p=0.132 n=6)
+Scaling/naive-12                           505.6m ± 1%    503.1m ±  0%       ~ (p=0.065 n=6)
+KeySprintf-12                              45.29n ± 3%    45.08n ±  1%       ~ (p=0.442 n=8)
+KeyStrconv-12                              20.45n ± 1%    20.27n ±  3%       ~ (p=0.138 n=8)
+KeyFlatIndex-12                           0.3161n ± 2%   0.3213n ±  4%       ~ (p=0.098 n=8)
+GridLookupMap-12                           56.00n ± 1%    54.76n ±  0%  -2.21% (p=0.000 n=8)
+GridLookupFlat-12                         0.3245n ± 1%   0.3225n ±  1%  -0.63% (p=0.003 n=8)
+RngXoshiro-12                              2.694n ± 1%    2.643n ±  0%  -1.91% (p=0.000 n=8)
+RngXoshiroIntn-12                          2.889n ± 0%    2.871n ±  0%  -0.62% (p=0.000 n=8)
+RngMathRandLocal-12                        2.830n ± 0%    2.990n ±  0%  +5.64% (p=0.000 n=8)
+RngMathRandGlobal-12                       5.864n ± 1%    5.830n ±  1%       ~ (p=0.138 n=8)
+Engine/small/flatgrid-12                                  5.246m ± 16%
+Engine/small/gradient-12                                  492.8m ±  1%
+Engine/small/nogc-12                                      5.406m ±  1%
+Engine/small/parallel-12                                  6.418m ±  3%
+Engine/small/scent-12                                     5.760m ±  2%
+Engine/medium/flatgrid-12                                 40.46m ±  1%
+Engine/medium/gradient-12                                  3.985 ±  2%
+Engine/medium/nogc-12                                     28.23m ±  2%
+Engine/medium/parallel-12                                 36.28m ±  2%
+Engine/medium/scent-12                                    42.13m ±  1%
+TickRate/flatgrid-12                                      40.35m ±  1%
+TickRate/gradient-12                                       3.990 ±  1%
+TickRate/nogc-12                                          28.15m ±  3%
+TickRate/parallel-12                                      36.80m ±  1%
+TickRate/scent-12                                         42.50m ±  1%
+Scaling/flatgrid-12                                       5.510m ±  2%
+Scaling/gradient-12                                       505.7m ±  4%
+Scaling/nogc-12                                           5.554m ± 73%
+Scaling/parallel-12                                       7.330m ± 14%
+Scaling/scent-12                                          6.083m ±  3%
+geomean                                    1.848µ         741.0µ        -0.13%
 
                           │ bench/results/baseline.txt │       bench/results/latest.txt       │
                           │            B/op            │     B/op      vs base                │
-Engine/small/naive-12                   41.49Mi ± 0%     41.49Mi ± 0%       ~ (p=0.310 n=6)
-Engine/medium/naive-12                  397.8Mi ± 0%     397.8Mi ± 0%       ~ (p=0.937 n=6)
-TickRate/naive-12                       397.8Mi ± 0%     397.9Mi ± 0%       ~ (p=0.093 n=6)
-Scaling/naive-12                        41.49Mi ± 0%     41.49Mi ± 0%  +0.00% (p=0.013 n=6)
+Engine/small/naive-12                   41.49Mi ± 0%     41.49Mi ± 0%       ~ (p=0.394 n=6)
+Engine/medium/naive-12                  397.8Mi ± 0%     397.8Mi ± 0%       ~ (p=0.589 n=6)
+TickRate/naive-12                       397.8Mi ± 0%     397.8Mi ± 0%       ~ (p=1.000 n=6)
+Scaling/naive-12                        41.49Mi ± 0%     41.50Mi ± 0%  +0.00% (p=0.024 n=6)
 KeySprintf-12                             6.000 ± 0%       6.000 ± 0%       ~ (p=1.000 n=8) ¹
 KeyStrconv-12                             7.000 ± 0%       7.000 ± 0%       ~ (p=1.000 n=8) ¹
 KeyFlatIndex-12                           0.000 ± 0%       0.000 ± 0%       ~ (p=1.000 n=8) ¹
@@ -48,15 +56,23 @@ RngMathRandLocal-12                       0.000 ± 0%       0.000 ± 0%       ~ 
 RngMathRandGlobal-12                      0.000 ± 0%       0.000 ± 0%       ~ (p=1.000 n=8) ¹
 Engine/small/flatgrid-12                                 1.341Mi ± 0%
 Engine/small/gradient-12                                 41.50Mi ± 0%
+Engine/small/nogc-12                                     156.3Ki ± 1%
+Engine/small/parallel-12                                 1.344Mi ± 0%
 Engine/small/scent-12                                    1.340Mi ± 0%
 Engine/medium/flatgrid-12                                8.574Mi ± 0%
 Engine/medium/gradient-12                                397.4Mi ± 0%
+Engine/medium/nogc-12                                    591.5Ki ± 0%
+Engine/medium/parallel-12                                8.577Mi ± 0%
 Engine/medium/scent-12                                   8.571Mi ± 0%
 TickRate/flatgrid-12                                     8.574Mi ± 0%
 TickRate/gradient-12                                     397.4Mi ± 0%
+TickRate/nogc-12                                         591.7Ki ± 0%
+TickRate/parallel-12                                     8.576Mi ± 0%
 TickRate/scent-12                                        8.571Mi ± 0%
 Scaling/flatgrid-12                                      1.341Mi ± 0%
 Scaling/gradient-12                                      41.50Mi ± 0%
+Scaling/nogc-12                                          153.0Ki ± 1%
+Scaling/parallel-12                                      1.343Mi ± 0%
 Scaling/scent-12                                         1.340Mi ± 0%
 geomean                                              ²                 +0.00%               ²
 ¹ all samples are equal
@@ -64,10 +80,10 @@ geomean                                              ²                 +0.00%  
 
                           │ bench/results/baseline.txt │      bench/results/latest.txt       │
                           │         allocs/op          │  allocs/op   vs base                │
-Engine/small/naive-12                    8.266M ± 0%     8.266M ± 0%       ~ (p=0.987 n=6)
-Engine/medium/naive-12                   66.30M ± 0%     66.30M ± 0%       ~ (p=0.130 n=6)
-TickRate/naive-12                        66.30M ± 0%     66.30M ± 0%       ~ (p=0.071 n=6)
-Scaling/naive-12                         8.266M ± 0%     8.266M ± 0%  +0.00% (p=0.026 n=6)
+Engine/small/naive-12                    8.266M ± 0%     8.266M ± 0%       ~ (p=0.452 n=6)
+Engine/medium/naive-12                   66.30M ± 0%     66.30M ± 0%  +0.00% (p=0.006 n=6)
+TickRate/naive-12                        66.30M ± 0%     66.30M ± 0%       ~ (p=0.732 n=6)
+Scaling/naive-12                         8.266M ± 0%     8.266M ± 0%  +0.00% (p=0.032 n=6)
 KeySprintf-12                             1.000 ± 0%      1.000 ± 0%       ~ (p=1.000 n=8) ¹
 KeyStrconv-12                             1.000 ± 0%      1.000 ± 0%       ~ (p=1.000 n=8) ¹
 KeyFlatIndex-12                           0.000 ± 0%      0.000 ± 0%       ~ (p=1.000 n=8) ¹
@@ -79,24 +95,34 @@ RngMathRandLocal-12                       0.000 ± 0%      0.000 ± 0%       ~ (
 RngMathRandGlobal-12                      0.000 ± 0%      0.000 ± 0%       ~ (p=1.000 n=8) ¹
 Engine/small/flatgrid-12                                 25.21k ± 0%
 Engine/small/gradient-12                                 8.266M ± 0%
+Engine/small/nogc-12                                      166.5 ± 3%
+Engine/small/parallel-12                                 25.24k ± 0%
 Engine/small/scent-12                                    25.21k ± 0%
 Engine/medium/flatgrid-12                                165.3k ± 0%
 Engine/medium/gradient-12                                66.30M ± 0%
+Engine/medium/nogc-12                                     441.0 ± 1%
+Engine/medium/parallel-12                                165.3k ± 0%
 Engine/medium/scent-12                                   165.1k ± 0%
 TickRate/flatgrid-12                                     165.3k ± 0%
 TickRate/gradient-12                                     66.30M ± 0%
+TickRate/nogc-12                                          440.5 ± 1%
+TickRate/parallel-12                                     165.3k ± 0%
 TickRate/scent-12                                        165.1k ± 0%
 Scaling/flatgrid-12                                      25.21k ± 0%
 Scaling/gradient-12                                      8.266M ± 0%
+Scaling/nogc-12                                           158.0 ± 5%
+Scaling/parallel-12                                      25.24k ± 0%
 Scaling/scent-12                                         25.21k ± 0%
 geomean                                              ²                +0.00%               ²
 ¹ all samples are equal
 ² summaries must be >0 to compute geomean
 
-                     │ bench/results/baseline.txt │      bench/results/latest.txt      │
-                     │          ticks/s           │   ticks/s     vs base              │
-TickRate/naive-12                      96.03 ± 2%    97.37 ±  1%  +1.40% (p=0.015 n=6)
-TickRate/flatgrid-12                                9.848k ± 16%
-TickRate/gradient-12                                 101.0 ±  2%
-TickRate/scent-12                                   9.475k ±  3%
-geomean                                96.02         978.6        +1.40%
+                     │ bench/results/baseline.txt │     bench/results/latest.txt      │
+                     │          ticks/s           │   ticks/s    vs base              │
+TickRate/naive-12                      96.03 ± 2%    96.55 ± 1%       ~ (p=0.132 n=6)
+TickRate/flatgrid-12                                9.914k ± 1%
+TickRate/gradient-12                                 100.2 ± 1%
+TickRate/nogc-12                                    14.21k ± 3%
+TickRate/parallel-12                                10.87k ± 1%
+TickRate/scent-12                                   9.412k ± 1%
+geomean                                96.02        2.277k       +0.54%

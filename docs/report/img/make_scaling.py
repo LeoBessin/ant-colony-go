@@ -24,21 +24,23 @@ plt.rcParams.update({
     "savefig.facecolor": SURFACE,
 })
 
-workers = ["1", "2", "4", "8", "12"]
-times = [140.6, 95.2, 78.8, 86.6, 87.1]
-flatgrid_ref = 134.4
+workers = ["1", "12"]
+times = [140.6, 87.1]
+colors = [BLUE, AQUA]  # 1 cœur = avant (bleu), 12 cœurs = après (vert)
 
-fig, ax = plt.subplots(figsize=(7.2, 4.0), dpi=200)
+fig, ax = plt.subplots(figsize=(5.4, 3.0), dpi=150)
 x = list(range(len(workers)))
-ax.bar(x, times, width=0.55, color=AQUA, zorder=3)
+ax.bar(x, times, width=0.55, color=colors, zorder=3)
 for xi, v in zip(x, times):
     ax.text(xi, v + 3, f"{v:.0f} ms", ha="center", va="bottom",
              fontsize=10, color=INK_PRIMARY)
 
-ax.axhline(flatgrid_ref, color=BLUE, linewidth=1.6, linestyle="--", zorder=2)
-ax.text(len(workers) - 0.4, flatgrid_ref + 3,
-         f"flatgrid (1 thread, référence) : {flatgrid_ref:.0f} ms",
-         ha="right", va="bottom", fontsize=9.5, color=BLUE)
+legend_handles = [
+    plt.Rectangle((0, 0), 1, 1, color=BLUE, label="1 cœur (avant)"),
+    plt.Rectangle((0, 0), 1, 1, color=AQUA, label="Plusieurs cœurs (après)"),
+]
+ax.legend(handles=legend_handles, loc="upper right", frameon=False,
+          fontsize=9.5, labelcolor=INK_SECONDARY)
 
 ax.set_xticks(x)
 ax.set_xticklabels(workers, fontsize=10.5, color=INK_PRIMARY)

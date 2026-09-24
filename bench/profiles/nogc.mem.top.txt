@@ -1,22 +1,31 @@
 File: antsim.exe
 Type: alloc_objects
-Time: 2026-09-24 10:35:24 CEST
-Showing nodes accounting for 15785, 100% of 15786 total
-Dropped 1 node (cum <= 78)
-Showing top 15 nodes out of 27
+Time: 2026-09-24 13:44:53 CEST
+Showing nodes accounting for 32999, 100% of 32999 total
+Showing top 25 nodes out of 31
       flat  flat%   sum%        cum   cum%
-      9371 59.36% 59.36%       9371 59.36%  antcolony/internal/engine/nogc.newWorld
-      4681 29.65% 89.02%       4681 29.65%  antcolony/internal/engine/nogc.newPool.func1
-      1538  9.74% 98.76%       1538  9.74%  runtime.mallocgc
-       195  1.24%   100%        195  1.24%  encoding/json.typeFields
-         0     0%   100%        195  1.24%  antcolony/internal/config.Load
-         0     0%   100%        195  1.24%  antcolony/internal/config.Parse
-         0     0%   100%       9371 59.36%  antcolony/internal/engine/nogc.(*Engine).Run
-         0     0%   100%        195  1.24%  encoding/json.(*Decoder).Decode
-         0     0%   100%        195  1.24%  encoding/json.(*decodeState).object
-         0     0%   100%        195  1.24%  encoding/json.(*decodeState).unmarshal
-         0     0%   100%        195  1.24%  encoding/json.(*decodeState).value
-         0     0%   100%        195  1.24%  encoding/json.cachedTypeFields
-         0     0%   100%       9567 60.60%  main.main
-         0     0%   100%       9567 60.60%  main.run
-         0     0%   100%       1538  9.74%  runtime.allocm
+     16384 49.65% 49.65%      16384 49.65%  syscall.ByteSliceFromString
+      5461 16.55% 66.20%       5461 16.55%  time.Sleep
+      4681 14.19% 80.38%       4681 14.19%  antcolony/internal/engine/nogc.newPool.func1
+      4681 14.19% 94.57%       4681 14.19%  antcolony/internal/engine/nogc.newWorld
+      1792  5.43%   100%       1792  5.43%  runtime.mallocgc
+         0     0%   100%       4681 14.19%  antcolony/internal/engine/nogc.(*Engine).Run
+         0     0%   100%      21065 63.84%  main.main
+         0     0%   100%      21065 63.84%  main.run
+         0     0%   100%      16384 49.65%  os.Create (inline)
+         0     0%   100%      16384 49.65%  os.OpenFile
+         0     0%   100%      16384 49.65%  os.ignoringEINTR (inline)
+         0     0%   100%      16384 49.65%  os.open (inline)
+         0     0%   100%      16384 49.65%  os.openFileNolog
+         0     0%   100%      16384 49.65%  os.openFileNolog.func1 (inline)
+         0     0%   100%        768  2.33%  runtime.allocm
+         0     0%   100%       1024  3.10%  runtime.gcBgMarkWorker
+         0     0%   100%      21065 63.84%  runtime.main
+         0     0%   100%        256  0.78%  runtime.mcall
+         0     0%   100%        512  1.55%  runtime.mstart
+         0     0%   100%        512  1.55%  runtime.mstart0
+         0     0%   100%        512  1.55%  runtime.mstart1
+         0     0%   100%        768  2.33%  runtime.newm
+         0     0%   100%       1792  5.43%  runtime.newobject
+         0     0%   100%        256  0.78%  runtime.park_m
+         0     0%   100%        512  1.55%  runtime.resetspinning

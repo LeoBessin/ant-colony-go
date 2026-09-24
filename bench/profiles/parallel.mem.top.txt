@@ -1,18 +1,16 @@
 File: antsim.exe
 Type: alloc_objects
-Time: 2026-09-24 10:35:24 CEST
-Showing nodes accounting for 666077, 100% of 666310 total
-Dropped 21 nodes (cum <= 3331)
+Time: 2026-09-24 13:44:53 CEST
+Showing nodes accounting for 201169, 99.51% of 202158 total
+Dropped 19 nodes (cum <= 1010)
       flat  flat%   sum%        cum   cum%
-    360453 54.10% 54.10%     622600 93.44%  antcolony/internal/engine/parallel.trailKey
-    262147 39.34% 93.44%     262147 39.34%  internal/strconv.FormatInt
-     33053  4.96% 98.40%     655653 98.40%  antcolony/internal/engine/parallel.(*World).commit
-      5743  0.86% 99.26%       5743  0.86%  runtime.mallocgc
-      4681   0.7%   100%       4681   0.7%  antcolony/internal/engine/parallel.newPool.func1
-         0     0%   100%     655657 98.40%  antcolony/internal/engine/parallel.(*Engine).Run
-         0     0%   100%     655653 98.40%  antcolony/internal/engine/parallel.(*World).tick
-         0     0%   100%     655658 98.40%  main.main
-         0     0%   100%     655658 98.40%  main.run
-         0     0%   100%     660567 99.14%  runtime.main
-         0     0%   100%       4681   0.7%  runtime.makechan
-         0     0%   100%     262147 39.34%  strconv.FormatInt (inline)
+    196611 97.26% 97.26%     196611 97.26%  antcolony/internal/engine/parallel.trailKey
+      3277  1.62% 98.88%       3277  1.62%  compress/gzip.NewWriterLevel
+      1281  0.63% 99.51%     197892 97.89%  antcolony/internal/engine/parallel.(*World).commit
+         0     0% 99.51%     197908 97.90%  antcolony/internal/engine/parallel.(*Engine).Run
+         0     0% 99.51%     197892 97.89%  antcolony/internal/engine/parallel.(*World).tick
+         0     0% 99.51%     197913 97.90%  main.main
+         0     0% 99.51%     197913 97.90%  main.run
+         0     0% 99.51%     197913 97.90%  runtime.main
+         0     0% 99.51%       3277  1.62%  runtime/pprof.newProfileBuilder
+         0     0% 99.51%       3277  1.62%  runtime/pprof.profileWriter

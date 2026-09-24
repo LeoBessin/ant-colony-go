@@ -1,19 +1,20 @@
 File: antsim.exe
 Type: alloc_objects
-Time: 2026-09-23 19:49:55 CEST
-Showing nodes accounting for 25100744, 99.81% of 25149610 total
-Dropped 32 nodes (cum <= 125748)
+Time: 2026-09-24 13:44:48 CEST
+Showing nodes accounting for 24447521, 100% of 24451646 total
+Dropped 21 nodes (cum <= 122258)
       flat  flat%   sum%        cum   cum%
-  25100667 99.81% 99.81%   25103188 99.82%  fmt.Sprintf
-        77 0.00031% 99.81%   24775581 98.51%  antcolony/internal/engine/gradient.(*World).decayGrid
-         0     0% 99.81%   25105904 99.83%  antcolony/internal/engine/gradient.(*Engine).Run
-         0     0% 99.81%     262147  1.04%  antcolony/internal/engine/gradient.(*World).chooseMove
-         0     0% 99.81%   24775581 98.51%  antcolony/internal/engine/gradient.(*World).decay
-         0     0% 99.81%   20220683 80.40%  antcolony/internal/engine/gradient.(*World).level
-         0     0% 99.81%     163842  0.65%  antcolony/internal/engine/gradient.(*World).passable
-         0     0% 99.81%     262147  1.04%  antcolony/internal/engine/gradient.(*World).sense
-         0     0% 99.81%   25105904 99.83%  antcolony/internal/engine/gradient.(*World).tick
-         0     0% 99.81%   25103188 99.82%  antcolony/internal/engine/gradient.key (inline)
-         0     0% 99.81%   25105904 99.83%  main.main
-         0     0% 99.81%   25105904 99.83%  main.run
-         0     0% 99.81%   25105904 99.83%  runtime.main
+  24445296   100%   100%   24447817   100%  fmt.Sprintf
+      2187 0.0089%   100%     133261  0.54%  antcolony/internal/engine/gradient.(*World).commit
+        38 0.00016%   100%   24087403 98.51%  antcolony/internal/engine/gradient.(*World).decayGrid
+         0     0%   100%   24450042   100%  antcolony/internal/engine/gradient.(*Engine).Run
+         0     0%   100%     229378  0.94%  antcolony/internal/engine/gradient.(*World).chooseMove
+         0     0%   100%   24087403 98.51%  antcolony/internal/engine/gradient.(*World).decay
+         0     0%   100%   19401470 79.35%  antcolony/internal/engine/gradient.(*World).level
+         0     0%   100%     131073  0.54%  antcolony/internal/engine/gradient.(*World).passable
+         0     0%   100%     229378  0.94%  antcolony/internal/engine/gradient.(*World).sense
+         0     0%   100%   24450042   100%  antcolony/internal/engine/gradient.(*World).tick
+         0     0%   100%   24447817   100%  antcolony/internal/engine/gradient.key (inline)
+         0     0%   100%   24450043   100%  main.main
+         0     0%   100%   24450043   100%  main.run
+         0     0%   100%   24450043   100%  runtime.main

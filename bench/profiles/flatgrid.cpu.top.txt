@@ -1,15 +1,13 @@
 File: antsim.exe
 Type: cpu
-Time: 2026-09-23 19:49:50 CEST
-Duration: 202.25ms, Total samples = 40ms (19.78%)
+Time: 2026-09-24 13:44:43 CEST
+Duration: 202.52ms, Total samples = 40ms (19.75%)
 Showing nodes accounting for 40ms, 100% of 40ms total
       flat  flat%   sum%        cum   cum%
       30ms 75.00% 75.00%       30ms 75.00%  runtime.madvise
-      10ms 25.00%   100%       10ms 25.00%  antcolony/internal/engine/flatgrid.(*World).idx (inline)
+      10ms 25.00%   100%       10ms 25.00%  antcolony/internal/engine/flatgrid.(*World).decayGrid
          0     0%   100%       10ms 25.00%  antcolony/internal/engine/flatgrid.(*Engine).Run
          0     0%   100%       10ms 25.00%  antcolony/internal/engine/flatgrid.(*World).decay
-         0     0%   100%       10ms 25.00%  antcolony/internal/engine/flatgrid.(*World).decayGrid
-         0     0%   100%       10ms 25.00%  antcolony/internal/engine/flatgrid.(*World).level (inline)
          0     0%   100%       10ms 25.00%  antcolony/internal/engine/flatgrid.(*World).tick
          0     0%   100%       10ms 25.00%  main.main
          0     0%   100%       10ms 25.00%  main.run
