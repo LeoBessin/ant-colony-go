@@ -13,6 +13,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/fs"
+	"net"
 	"net/http"
 	"runtime"
 	"time"
@@ -26,8 +27,9 @@ var staticFS embed.FS
 
 // Server serves the UI.
 type Server struct {
-	hub *hub
-	mux *http.ServeMux
+	hub     *hub
+	mux     *http.ServeMux
+	handler http.Handler
 }
 
 // New builds the HTTP handler.
@@ -47,10 +49,12 @@ func New() *Server {
 	s.mux.HandleFunc("/api/stop", s.handleStop)
 	s.mux.HandleFunc("/api/result", s.handleResult)
 	s.mux.HandleFunc("/api/bench", s.handleBench)
+	s.mux.HandleFunc("/healthz", handleHealth)
+	s.handler = withGzip(s.mux)
 	return s
 }
 
-func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) { s.mux.ServeHTTP(w, r) }
+func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) { s.handler.ServeHTTP(w, r) }
 
 func writeJSON(w http.ResponseWriter, code int, v any) {
 	w.Header().Set("Content-Type", "application/json")
@@ -60,6 +64,13 @@ func writeJSON(w http.ResponseWriter, code int, v any) {
 
 func writeErr(w http.ResponseWriter, code int, err error) {
 	writeJSON(w, code, map[string]string{"error": err.Error()})
+}
+
+// handleHealth answers the container healthcheck. It touches nothing else so
+// a slow bench run can never make the container look dead.
+func handleHealth(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	_, _ = w.Write([]byte("ok\n"))
 }
 
 // --- metadata ---------------------------------------------------------------
@@ -174,6 +185,9 @@ func (s *Server) handleStream(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// The stream outlives the server-wide WriteTimeout by design.
+	_ = http.NewResponseController(w).SetWriteDeadline(time.Time{})
+
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
@@ -286,6 +300,9 @@ func (s *Server) handleBench(w http.ResponseWriter, r *http.Request) {
 	if req.Repeat < 1 {
 		req.Repeat = 1
 	}
+	// A large scenario with repeats can outlast the server-wide WriteTimeout.
+	_ = http.NewResponseController(w).SetWriteDeadline(time.Time{})
+
 	engines := req.Engines
 	if len(engines) == 0 {
 		engines = simcore.Names()
@@ -370,21 +387,56 @@ func (s *Server) handleBench(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// Listen starts the server and blocks until ctx is cancelled.
-func (s *Server) Listen(ctx context.Context, addr string) error {
-	srv := &http.Server{
+// newHTTPServer applies the transport settings from the network course:
+//
+//   - HTTP/2 alongside HTTP/1.1, including cleartext HTTP/2 (h2c) for clients
+//     that speak it with prior knowledge (curl --http2-prior-knowledge,
+//     vegeta -h2c). Browsers only negotiate HTTP/2 over TLS, see Listen.
+//   - A long IdleTimeout so keep-alive sockets are reused rather than paying
+//     the TCP handshake again on every request.
+//   - Read and write deadlines, so a stalled client cannot hold a goroutine
+//     and a socket forever. The SSE and bench handlers lift the write
+//     deadline themselves.
+//   - BaseContext tied to ctx: on shutdown every request context is cancelled,
+//     so open SSE streams return and running benches abort instead of making
+//     Shutdown wait for them.
+func (s *Server) newHTTPServer(ctx context.Context, addr string) *http.Server {
+	protocols := new(http.Protocols)
+	protocols.SetHTTP1(true)
+	protocols.SetHTTP2(true)
+	protocols.SetUnencryptedHTTP2(true)
+	return &http.Server{
 		Addr:              addr,
 		Handler:           s,
+		Protocols:         protocols,
 		ReadHeaderTimeout: 5 * time.Second,
-		// No WriteTimeout: SSE connections are deliberately long-lived.
+		ReadTimeout:       10 * time.Second,
+		WriteTimeout:      30 * time.Second,
+		IdleTimeout:       120 * time.Second,
+		MaxHeaderBytes:    64 << 10,
+		BaseContext:       func(net.Listener) context.Context { return ctx },
 	}
+}
+
+// Listen starts the server and blocks until ctx is cancelled. With a
+// certificate and key it serves TLS, where browsers negotiate HTTP/2 and the
+// SSE stream shares one multiplexed socket with the API calls instead of
+// taking one of the six HTTP/1.1 connections a browser allows per origin.
+func (s *Server) Listen(ctx context.Context, addr, certFile, keyFile string) error {
+	srv := s.newHTTPServer(ctx, addr)
 	go func() {
 		<-ctx.Done()
 		shutCtx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 		defer cancel()
 		_ = srv.Shutdown(shutCtx)
 	}()
-	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+	var err error
+	if certFile != "" && keyFile != "" {
+		err = srv.ListenAndServeTLS(certFile, keyFile)
+	} else {
+		err = srv.ListenAndServe()
+	}
+	if err != nil && err != http.ErrServerClosed {
 		return err
 	}
 	return nil

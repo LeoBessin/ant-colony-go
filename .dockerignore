@@ -1,0 +1,10 @@
+.git
+bin/
+bench/results/
+bench/profiles/
+bench.test
+*.pprof
+*.prof
+docs/
+Dockerfile
+docker-compose.yml

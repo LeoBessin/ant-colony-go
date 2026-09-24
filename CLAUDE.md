@@ -238,6 +238,7 @@ make test          # gate de correction uniquement
 make bench         # go test -bench + benchstat (avant/après)
 make profile       # profils pprof CPU + tas → bench/profiles/
 make web           # interface du harnais sur http://localhost:8080
+make compose-up    # même interface en conteneur (docker compose, port 8080)
 make run           # une exécution headless
 ```
 
@@ -253,11 +254,12 @@ go tool pprof -http=:8081 bench/profiles/naive.cpu.pprof   # flamegraph interact
 
 **Piège :** `cmd/antweb` embarque les scénarios via `go:embed`. Modifier un
 scénario impose de reconstruire `antweb`, sinon l'UI continue de simuler
-l'ancien.
+l'ancien. Idem pour l'image Docker : `docker compose up --build`. Le conteneur
+n'est jamais une cible de mesure.
 
 ### Prérequis
 
-Go 1.23+ requis (construit et mesuré sur **go1.26.4 darwin/arm64**). Les
+Go 1.24+ requis (HTTP/2 en clair de `net/http` pour `antweb`) (construit et mesuré sur **go1.26.4 darwin/arm64**). Les
 outils optionnels dégradent en étape ignorée avec un avertissement, jamais en
 échec :
 

@@ -82,6 +82,29 @@ go install golang.org/x/perf/cmd/benchstat@latest
 brew install graphviz
 ```
 
+### Harnais web en conteneur
+
+```bash
+docker compose up --build -d   # ou : make compose-up — http://localhost:8080
+docker compose down            # ou : make compose-down
+```
+
+Image multi-étage (`golang:1.26-alpine` → `distroless/static:nonroot`,
+~17 Mo). Le serveur applique les leviers réseau de la séance J4 :
+
+- **HTTP/2** en plus d'HTTP/1.1, y compris en clair (h2c) pour les clients qui
+  le parlent d'emblée (`curl --http2-prior-knowledge`, `vegeta -h2c`). Les
+  navigateurs ne négocient HTTP/2 qu'en TLS : `antweb -cert … -key …`.
+- **Keep-alive** (`IdleTimeout` 120 s) : les sockets sont réutilisées au lieu
+  de repayer la poignée de main TCP à chaque requête.
+- **gzip** sur le JSON et les fichiers statiques, jamais sur le flux SSE.
+- Délais de lecture/écriture, `/healthz` pour le healthcheck, et arrêt propre
+  sur SIGTERM (flux SSE fermés, benchs annulés).
+
+Les chiffres affichés par l'UI conteneurisée sont **indicatifs** : les mesures
+du rapport viennent de `cmd/antsim` sous hyperfine. Les scénarios étant
+embarqués (`go:embed`), en modifier un impose de relancer avec `--build`.
+
 ### Commandes citées dans `docs/report/auditfinal.md`
 
 Reproduction des mesures du rapport de synthèse, dans l'ordre où il les cite.

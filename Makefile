@@ -7,7 +7,7 @@
 SHELL := bash
 BENCH_SCENARIO ?= medium
 
-.PHONY: all help run web test bench build hyper profile report env clean golden fmt vet
+.PHONY: all help run web test bench build hyper profile report env clean golden fmt vet compose-up compose-down
 
 help:
 	@echo "make all       - suite complete (env, test, bench, build, hyperfine, pprof, report)"
@@ -19,6 +19,8 @@ help:
 	@echo "make env       - capture la specification du banc d essai"
 	@echo "make run       - une execution headless (BENCH_SCENARIO=$(BENCH_SCENARIO))"
 	@echo "make web       - lance l interface du harnais sur http://localhost:8080"
+	@echo "make compose-up   - construit et lance le harnais web en conteneur (port 8080)"
+	@echo "make compose-down - arrete le conteneur du harnais"
 	@echo "make golden    - REGENERE les fichiers golden (seulement si la definition a change)"
 	@echo "make clean     - supprime les artefacts de build et de mesure"
 
@@ -36,6 +38,15 @@ run: build
 
 web:
 	go run ./cmd/antweb
+
+# Harnais web en conteneur. Indicatif uniquement : ce n est pas une cible de
+# mesure. --build est indispensable apres toute modification d un scenario
+# (go:embed).
+compose-up:
+	docker compose up --build -d
+
+compose-down:
+	docker compose down
 
 fmt:
 	gofmt -l -w .
