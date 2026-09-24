@@ -12,16 +12,6 @@ services:
     expose:
       - "8080"
     restart: unless-stopped
-    # Authentification HTTP Basic, appliquée par le proxy Caddy de Coolify.
-    # Le hash n'est PAS dans le dépôt (public) : BASIC_AUTH_USER et
-    # BASIC_AUTH_HASH se renseignent dans Coolify > Environment Variables.
-    # Hash à générer avec `caddy hash-password` (voir README). Une valeur
-    # substituée n'est pas ré-interprétée par compose : les `$` du hash
-    # bcrypt n'ont pas à être doublés. `caddy_0` = première route Caddy
-    # générée par Coolify pour le domaine du service. En local, sans Caddy,
-    # le label est inerte.
-    labels:
-      - "caddy_0.basicauth.${BASIC_AUTH_USER:-admin}=${BASIC_AUTH_HASH:-}"
     # Plafond dur côté hôte, en plus des limites applicatives
     # (internal/uiserver/limits.go) : même un bug ou une requête imprévue ne
     # peut pas prendre plus de 2 cœurs ni 512 Mo au VPS.
@@ -37,6 +27,14 @@ services:
     environment:
       GOMAXPROCS: "2"
       GOMEMLIMIT: 400MiB
+      # Authentification HTTP Basic, appliquée par antweb lui-même (et non
+      # par le proxy : Coolify ne substitue pas les variables dans les labels,
+      # et ses noms de routeurs Traefik lui sont propres). Valeurs à
+      # renseigner dans Coolify > Environment Variables ; rien dans le dépôt.
+      # Sans mot de passe, l'auth est désactivée (usage local) et antweb
+      # l'annonce au démarrage. /healthz reste ouvert pour le healthcheck.
+      BASIC_AUTH_USER: ${BASIC_AUTH_USER:-admin}
+      BASIC_AUTH_PASSWORD: ${BASIC_AUTH_PASSWORD:-}
     # Le binaire se sonde lui-même : l'image distroless n'a ni curl ni wget.
     healthcheck:
       test: ["CMD", "/antweb", "-healthcheck", "-addr", "localhost:8080"]

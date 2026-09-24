@@ -109,14 +109,12 @@ les moteurs avant `nogc` gardent `Ant.Trail`, la fuite de l'optimisation n°4 :
 60 s, exécution en direct coupée à 5 min (`internal/uiserver/limits.go`). Le
 conteneur est en plus plafonné à 2 cœurs et 512 Mo (`docker-compose.yml`).
 
-En déploiement Coolify (proxy Caddy), le domaine est protégé par une
-authentification HTTP Basic. Le hash n'est pas versionné : le générer, puis
-renseigner `BASIC_AUTH_USER` et `BASIC_AUTH_HASH` dans Coolify → Environment
-Variables **avant** de redéployer.
-
-```bash
-docker run --rm caddy caddy hash-password --plaintext '<mot de passe>'
-```
+En déploiement, le harnais est protégé par une authentification HTTP Basic
+appliquée par `antweb` lui-même (quel que soit le proxy devant, et sur tous les
+domaines). Renseigner `BASIC_AUTH_USER` et `BASIC_AUTH_PASSWORD` dans Coolify →
+Environment Variables ; rien n'est versionné. Sans mot de passe, l'auth est
+désactivée (usage local) et `antweb` l'annonce au démarrage. `/healthz` reste
+ouvert pour le healthcheck.
 
 Les chiffres affichés par l'UI conteneurisée sont **indicatifs** : les mesures
 du rapport viennent de `cmd/antsim` sous hyperfine. Les scénarios étant

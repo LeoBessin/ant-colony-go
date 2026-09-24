@@ -149,3 +149,40 @@ func TestBenchIsSerialized(t *testing.T) {
 		t.Fatalf("status %d after the slot freed: %s", rec.Code, rec.Body)
 	}
 }
+
+func TestBasicAuth(t *testing.T) {
+	s := New()
+	s.RequireBasicAuth("leo", "s3cret")
+
+	get := func(path, user, pass string) *httptest.ResponseRecorder {
+		req := httptest.NewRequest(http.MethodGet, path, nil)
+		if user != "" || pass != "" {
+			req.SetBasicAuth(user, pass)
+		}
+		rec := httptest.NewRecorder()
+		s.ServeHTTP(rec, req)
+		return rec
+	}
+
+	for _, c := range []struct{ name, user, pass string }{
+		{"no credentials", "", ""},
+		{"wrong password", "leo", "nope"},
+		{"wrong user", "admin", "s3cret"},
+		{"password prefix", "leo", "s3cre"},
+	} {
+		rec := get("/", c.user, c.pass)
+		if rec.Code != http.StatusUnauthorized {
+			t.Errorf("%s: status %d, want 401", c.name, rec.Code)
+		}
+		if rec.Header().Get("WWW-Authenticate") == "" {
+			t.Errorf("%s: no WWW-Authenticate header, the browser would not prompt", c.name)
+		}
+	}
+	if rec := get("/api/meta", "leo", "s3cret"); rec.Code != http.StatusOK {
+		t.Errorf("valid credentials: status %d", rec.Code)
+	}
+	// The container healthcheck probes without credentials.
+	if rec := get("/healthz", "", ""); rec.Code != http.StatusOK {
+		t.Errorf("/healthz behind auth: status %d", rec.Code)
+	}
+}

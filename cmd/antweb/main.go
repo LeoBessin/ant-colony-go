@@ -40,8 +40,22 @@ func main() {
 	if *cert != "" && *key != "" {
 		scheme = "https"
 	}
+	srv := uiserver.New()
+	// Credentials come from the environment, not flags, so they never show
+	// up in `ps` or in the compose file. This is server configuration: the
+	// simulation itself still reads no environment variable.
+	if user, pass := os.Getenv("BASIC_AUTH_USER"), os.Getenv("BASIC_AUTH_PASSWORD"); pass != "" {
+		if user == "" {
+			user = "admin"
+		}
+		srv.RequireBasicAuth(user, pass)
+		fmt.Fprintf(os.Stderr, "basic auth enabled for user %q\n", user)
+	} else {
+		fmt.Fprintln(os.Stderr, "WARNING: basic auth disabled (BASIC_AUTH_PASSWORD unset): the harness is open to anyone who can reach it")
+	}
+
 	fmt.Fprintf(os.Stderr, "ant colony harness: %s://%s\n", scheme, *addr)
-	if err := uiserver.New().Listen(ctx, *addr, *cert, *key); err != nil {
+	if err := srv.Listen(ctx, *addr, *cert, *key); err != nil {
 		fmt.Fprintln(os.Stderr, "antweb:", err)
 		os.Exit(1)
 	}
