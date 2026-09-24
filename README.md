@@ -101,6 +101,12 @@ Image multi-étage (`golang:1.26-alpine` → `distroless/static:nonroot`,
 - Délais de lecture/écriture, `/healthz` pour le healthcheck, et arrêt propre
   sur SIGTERM (flux SSE fermés, benchs annulés).
 
+Exposé sur un serveur, le harnais est **borné** pour ne pas épuiser l'hôte :
+grille ≤ 256×256, ≤ 5000 fourmis, ≤ 5000 ticks, `repeat` ≤ 5, corps de requête
+≤ 1 Mo, un seul bench à la fois (les autres reçoivent `429`), bench coupé à
+60 s, exécution en direct coupée à 5 min (`internal/uiserver/limits.go`). Le
+conteneur est en plus plafonné à 2 cœurs et 512 Mo (`docker-compose.yml`).
+
 Les chiffres affichés par l'UI conteneurisée sont **indicatifs** : les mesures
 du rapport viennent de `cmd/antsim` sous hyperfine. Les scénarios étant
 embarqués (`go:embed`), en modifier un impose de relancer avec `--build`.

@@ -66,7 +66,9 @@ func (h *hub) start(cfg config.Config, engineName string, interval int) (*run, e
 		interval = 1
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
+	// A live run stops at runTimeout even if nobody presses Stop: the only
+	// thing keeping it alive otherwise is its tick count.
+	ctx, cancel := context.WithTimeout(context.Background(), runTimeout)
 	r := &run{
 		id:     fmt.Sprintf("r%d", h.next.Add(1)),
 		cfg:    cfg,

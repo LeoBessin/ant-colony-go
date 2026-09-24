@@ -12,6 +12,21 @@ services:
     expose:
       - "8080"
     restart: unless-stopped
+    # Plafond dur côté hôte, en plus des limites applicatives
+    # (internal/uiserver/limits.go) : même un bug ou une requête imprévue ne
+    # peut pas prendre plus de 2 cœurs ni 512 Mo au VPS.
+    # Go ne lit le quota CPU du cgroup que si go.mod déclare >= 1.25 (ici
+    # 1.24) : sans GOMAXPROCS, le runtime lancerait un thread par cœur de
+    # l'hôte et se ferait brider par le quota. À garder égal à `cpus`.
+    # Go ne lit pas non plus la limite mémoire, d'où GOMEMLIMIT, qui fait
+    # ramasser le GC avant que le noyau ne tue le conteneur. Pic mesuré :
+    # 52 Mo (naive, large).
+    cpus: "2"
+    mem_limit: 512m
+    pids_limit: 256
+    environment:
+      GOMAXPROCS: "2"
+      GOMEMLIMIT: 400MiB
     # Le binaire se sonde lui-même : l'image distroless n'a ni curl ni wget.
     healthcheck:
       test: ["CMD", "/antweb", "-healthcheck", "-addr", "localhost:8080"]
