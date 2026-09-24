@@ -10,6 +10,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -24,6 +25,7 @@ func main() {
 	addr := flag.String("addr", "localhost:8080", "listen address")
 	cert := flag.String("cert", "", "TLS certificate file (enables HTTPS and HTTP/2 for browsers)")
 	key := flag.String("key", "", "TLS private key file")
+	unlimited := flag.Bool("unlimited", false, "lift the server's resource caps, timeouts and bench serialization (local load testing; loopback addresses only)")
 	health := flag.Bool("healthcheck", false, "probe http://<addr>/healthz and exit 0 if healthy (for container healthchecks)")
 	flag.Parse()
 
@@ -54,11 +56,36 @@ func main() {
 		fmt.Fprintln(os.Stderr, "WARNING: basic auth disabled (BASIC_AUTH_PASSWORD unset): the harness is open to anyone who can reach it")
 	}
 
+	if *unlimited {
+		// The caps are what keep an exposed harness alive: lifting them is
+		// refused unless only this machine can reach the server.
+		if !isLoopback(*addr) {
+			fmt.Fprintf(os.Stderr, "antweb: -unlimited requires a loopback address, got %q\n", *addr)
+			os.Exit(2)
+		}
+		srv.DisableLimits()
+		fmt.Fprintln(os.Stderr, "WARNING: limits disabled (-unlimited): no caps, no timeouts, concurrent benches allowed")
+	}
+
 	fmt.Fprintf(os.Stderr, "ant colony harness: %s://%s\n", scheme, *addr)
 	if err := srv.Listen(ctx, *addr, *cert, *key); err != nil {
 		fmt.Fprintln(os.Stderr, "antweb:", err)
 		os.Exit(1)
 	}
+}
+
+// isLoopback reports whether addr only listens on this machine. An empty
+// host (":8080") means every interface and is rejected.
+func isLoopback(addr string) bool {
+	host, _, err := net.SplitHostPort(addr)
+	if err != nil {
+		return false
+	}
+	if host == "localhost" {
+		return true
+	}
+	ip := net.ParseIP(host)
+	return ip != nil && ip.IsLoopback()
 }
 
 // probe lets the distroless image check itself without shipping curl.

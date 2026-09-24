@@ -52,6 +52,8 @@ type hub struct {
 	mu   sync.Mutex
 	runs map[string]*run
 	next atomic.Int64
+	// unlimited drops runTimeout (Server.DisableLimits).
+	unlimited bool
 }
 
 func newHub() *hub { return &hub{runs: make(map[string]*run)} }
@@ -68,7 +70,10 @@ func (h *hub) start(cfg config.Config, engineName string, interval int) (*run, e
 
 	// A live run stops at runTimeout even if nobody presses Stop: the only
 	// thing keeping it alive otherwise is its tick count.
-	ctx, cancel := context.WithTimeout(context.Background(), runTimeout)
+	ctx, cancel := context.WithCancel(context.Background())
+	if !h.unlimited {
+		ctx, cancel = context.WithTimeout(context.Background(), runTimeout)
+	}
 	r := &run{
 		id:     fmt.Sprintf("r%d", h.next.Add(1)),
 		cfg:    cfg,
