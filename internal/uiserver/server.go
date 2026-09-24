@@ -34,6 +34,10 @@ type Server struct {
 	// parallel engine uses every core: concurrent ones would only slow each
 	// other down and let a handful of requests saturate the host.
 	benchSlot chan struct{}
+	// unlimited lifts every cap in limits.go, the bench serialization and
+	// the per-request wall-clock budgets. Local load testing only: see
+	// DisableLimits.
+	unlimited bool
 }
 
 // New builds the HTTP handler.
@@ -56,6 +60,15 @@ func New() *Server {
 	s.mux.HandleFunc("/healthz", handleHealth)
 	s.handler = withGzip(s.mux)
 	return s
+}
+
+// DisableLimits lifts the resource caps, the one-bench-at-a-time rule and
+// the run/bench timeouts, so a local load test (vegeta, hey) measures the
+// engines rather than the server's refusals. It must never be enabled on an
+// exposed server: cmd/antweb only allows it on a loopback address.
+func (s *Server) DisableLimits() {
+	s.unlimited = true
+	s.hub.unlimited = true
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) { s.handler.ServeHTTP(w, r) }
@@ -138,9 +151,6 @@ func (req runRequest) resolve() (config.Config, error) {
 	if err := cfg.Validate(); err != nil {
 		return config.Config{}, err
 	}
-	if err := checkLimits(cfg); err != nil {
-		return config.Config{}, err
-	}
 	return cfg, nil
 }
 
@@ -156,6 +166,9 @@ func (s *Server) handleRun(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	cfg, err := req.resolve()
+	if err == nil {
+		err = s.checkLimits(cfg)
+	}
 	if err != nil {
 		writeErr(w, http.StatusBadRequest, err)
 		return
@@ -306,36 +319,45 @@ func (s *Server) handleBench(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, err)
 		return
 	}
-	if err := checkLimits(cfg); err != nil {
+	if err := s.checkLimits(cfg); err != nil {
 		writeErr(w, http.StatusBadRequest, err)
 		return
 	}
 	if req.Repeat < 1 {
 		req.Repeat = 1
 	}
-	if req.Repeat > maxRepeat {
+	if req.Repeat > maxRepeat && !s.unlimited {
 		writeErr(w, http.StatusBadRequest, fmt.Errorf("repeat %d exceeds the server limit of %d", req.Repeat, maxRepeat))
 		return
 	}
 
-	select {
-	case s.benchSlot <- struct{}{}:
-		defer func() { <-s.benchSlot }()
-	default:
-		w.Header().Set("Retry-After", "10")
-		writeErr(w, http.StatusTooManyRequests, fmt.Errorf("another benchmark is running, retry shortly"))
-		return
+	if !s.unlimited {
+		select {
+		case s.benchSlot <- struct{}{}:
+			defer func() { <-s.benchSlot }()
+		default:
+			w.Header().Set("Retry-After", "10")
+			writeErr(w, http.StatusTooManyRequests, fmt.Errorf("another benchmark is running, retry shortly"))
+			return
+		}
 	}
 	// A large scenario with repeats can outlast the server-wide WriteTimeout;
-	// the bench's own budget bounds it instead.
-	_ = http.NewResponseController(w).SetWriteDeadline(time.Now().Add(benchTimeout + 5*time.Second))
+	// the bench's own budget bounds it instead. Unlimited: no deadline at all.
+	deadline := time.Time{}
+	if !s.unlimited {
+		deadline = time.Now().Add(benchTimeout + 5*time.Second)
+	}
+	_ = http.NewResponseController(w).SetWriteDeadline(deadline)
 
 	engines := req.Engines
 	if len(engines) == 0 {
 		engines = simcore.Names()
 	}
 
-	ctx, cancel := context.WithTimeout(r.Context(), benchTimeout)
+	ctx, cancel := context.WithCancel(r.Context())
+	if !s.unlimited {
+		ctx, cancel = context.WithTimeout(r.Context(), benchTimeout)
+	}
 	defer cancel()
 	rows := make([]benchRow, 0, len(engines))
 	// Both the checksum reference and the speedup baseline are per VARIANT.

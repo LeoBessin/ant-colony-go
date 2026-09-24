@@ -186,3 +186,22 @@ func TestBasicAuth(t *testing.T) {
 		t.Errorf("/healthz behind auth: status %d", rec.Code)
 	}
 }
+
+// Unlimited mode (local load testing) admits what the caps refuse, and
+// lets benches run concurrently.
+func TestDisableLimits(t *testing.T) {
+	s := New()
+	s.DisableLimits()
+	if rec := post(t, s, "/api/bench", `{"scenario":"tiny","engines":["naive"],"repeat":6,"ticks":5}`); rec.Code != http.StatusOK {
+		t.Fatalf("repeat above cap: status %d: %s", rec.Code, rec.Body)
+	}
+	s.benchSlot <- struct{}{} // would mean "a bench is running" in limited mode
+	if rec := post(t, s, "/api/bench", `{"scenario":"tiny","engines":["naive"],"ticks":5}`); rec.Code != http.StatusOK {
+		t.Fatalf("concurrent bench: status %d: %s", rec.Code, rec.Body)
+	}
+	// No engine is registered in this package's tests, so the run itself
+	// fails; what matters is that the caps no longer refuse it.
+	if rec := post(t, s, "/api/run", `{"scenario":"tiny","engine":"naive","ticks":6000}`); strings.Contains(rec.Body.String(), "server limit") {
+		t.Fatalf("ticks above cap still refused: %s", rec.Body)
+	}
+}

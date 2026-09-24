@@ -44,6 +44,14 @@ const (
 	benchTimeout = 60 * time.Second
 )
 
+// checkLimits applies the caps unless the server runs unlimited.
+func (s *Server) checkLimits(cfg config.Config) error {
+	if s.unlimited {
+		return nil
+	}
+	return checkLimits(cfg)
+}
+
 // checkLimits rejects a configuration exceeding the server's caps.
 func checkLimits(cfg config.Config) error {
 	switch {
