@@ -4,8 +4,13 @@ services:
   antweb:
     build: .
     image: antcolony/antweb:latest
-    ports:
-      - "8080:8080"
+    # Pas de port publié sur l'hôte : en déploiement (Coolify), le proxy
+    # joint le conteneur par le réseau Docker, et un port hôte fixe entre en
+    # collision avec tout autre service déjà sur 8080. Le port 8080:8080 pour
+    # un lancement local est dans docker-compose.override.yml, que
+    # `docker compose up` charge d'office (Coolify passe -f et l'ignore).
+    expose:
+      - "8080"
     restart: unless-stopped
     # Le binaire se sonde lui-même : l'image distroless n'a ni curl ni wget.
     healthcheck:

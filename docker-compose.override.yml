@@ -1,0 +1,7 @@
+# Chargé automatiquement par `docker compose up` en local : publie le harnais
+# sur http://localhost:8080. Ignoré dès qu'un fichier est passé avec -f
+# (c'est le cas de Coolify), d'où sa séparation de docker-compose.yml.
+services:
+  antweb:
+    ports:
+      - "8080:8080"

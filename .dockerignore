@@ -8,3 +8,4 @@ bench.test
 docs/
 Dockerfile
 docker-compose.yml
+docker-compose.override.yml
