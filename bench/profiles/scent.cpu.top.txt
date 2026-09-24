@@ -1,0 +1,12 @@
+File: antsim.exe
+Type: cpu
+Time: 2026-09-23 19:50:00 CEST
+Duration: 202.29ms, Total samples = 40ms (19.77%)
+Showing nodes accounting for 40ms, 100% of 40ms total
+      flat  flat%   sum%        cum   cum%
+      40ms   100%   100%       40ms   100%  runtime.madvise
+         0     0%   100%       40ms   100%  runtime.(*mheap).alloc.func1
+         0     0%   100%       40ms   100%  runtime.(*mheap).allocSpan
+         0     0%   100%       40ms   100%  runtime.sysUsed (inline)
+         0     0%   100%       40ms   100%  runtime.sysUsedOS (inline)
+         0     0%   100%       40ms   100%  runtime.systemstack

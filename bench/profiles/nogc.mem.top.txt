@@ -1,0 +1,22 @@
+File: antsim.exe
+Type: alloc_objects
+Time: 2026-09-24 10:35:24 CEST
+Showing nodes accounting for 15785, 100% of 15786 total
+Dropped 1 node (cum <= 78)
+Showing top 15 nodes out of 27
+      flat  flat%   sum%        cum   cum%
+      9371 59.36% 59.36%       9371 59.36%  antcolony/internal/engine/nogc.newWorld
+      4681 29.65% 89.02%       4681 29.65%  antcolony/internal/engine/nogc.newPool.func1
+      1538  9.74% 98.76%       1538  9.74%  runtime.mallocgc
+       195  1.24%   100%        195  1.24%  encoding/json.typeFields
+         0     0%   100%        195  1.24%  antcolony/internal/config.Load
+         0     0%   100%        195  1.24%  antcolony/internal/config.Parse
+         0     0%   100%       9371 59.36%  antcolony/internal/engine/nogc.(*Engine).Run
+         0     0%   100%        195  1.24%  encoding/json.(*Decoder).Decode
+         0     0%   100%        195  1.24%  encoding/json.(*decodeState).object
+         0     0%   100%        195  1.24%  encoding/json.(*decodeState).unmarshal
+         0     0%   100%        195  1.24%  encoding/json.(*decodeState).value
+         0     0%   100%        195  1.24%  encoding/json.cachedTypeFields
+         0     0%   100%       9567 60.60%  main.main
+         0     0%   100%       9567 60.60%  main.run
+         0     0%   100%       1538  9.74%  runtime.allocm

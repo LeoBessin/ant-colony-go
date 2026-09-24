@@ -327,7 +327,6 @@ La ligne v0 → v1, remplie — entrée complète :
       (`TestNogcAllocationsDoNotGrowWithTicks`), checksum identique.
       **Chiffres du banc §1.1 : en attente.** Brouillon hors banc :
       [`docs/journal/07-nogc.md`](../journal/07-nogc.md).
-- [ ] _(optionnel)_ v2 `soa` — `[]*Ant` → AoS → SoA ; alignement des champs, `int32`/`uint8`
 
 ### 3.2 Concurrence & scalabilité CPU
 

@@ -1,0 +1,33 @@
+File: antsim.exe
+Type: cpu
+Time: 2026-09-23 19:49:51 CEST
+Duration: 4.24s, Total samples = 3800ms (89.68%)
+Showing nodes accounting for 3280ms, 86.32% of 3800ms total
+Dropped 52 nodes (cum <= 19ms)
+Showing top 25 nodes out of 96
+      flat  flat%   sum%        cum   cum%
+     510ms 13.42% 13.42%      750ms 19.74%  fmt.(*fmt).fmtInteger
+     310ms  8.16% 21.58%     1210ms 31.84%  fmt.(*pp).doPrintf
+     270ms  7.11% 28.68%      270ms  7.11%  runtime.madvise
+     270ms  7.11% 35.79%      700ms 18.42%  runtime.mapaccess1_faststr
+     240ms  6.32% 42.11%      270ms  7.11%  runtime.mallocgcTiny
+     220ms  5.79% 47.89%      220ms  5.79%  runtime.pthread_cond_signal
+     180ms  4.74% 52.63%      180ms  4.74%  runtime.memmove
+     140ms  3.68% 56.32%      140ms  3.68%  aeshashbody
+     100ms  2.63% 58.95%      240ms  6.32%  fmt.(*fmt).pad
+     100ms  2.63% 61.58%      390ms 10.26%  runtime.mallocgc
+      80ms  2.11% 63.68%       80ms  2.11%  internal/runtime/maps.(*groupReference).key (inline)
+      80ms  2.11% 65.79%       80ms  2.11%  internal/runtime/maps.probeSeq.next (inline)
+      80ms  2.11% 67.89%       80ms  2.11%  runtime.pthread_cond_wait
+      80ms  2.11% 70.00%       80ms  2.11%  runtime.pthread_kill
+      70ms  1.84% 71.84%      870ms 22.89%  fmt.(*pp).printArg
+      70ms  1.84% 73.68%      120ms  3.16%  sync.(*Pool).pin
+      60ms  1.58% 75.26%     2090ms 55.00%  fmt.Sprintf
+      60ms  1.58% 76.84%      200ms  5.26%  fmt.newPrinter
+      60ms  1.58% 78.42%       60ms  1.58%  runtime.convT64
+      60ms  1.58% 80.00%      140ms  3.68%  sync.(*Pool).Get
+      50ms  1.32% 81.32%      800ms 21.05%  fmt.(*pp).fmtInteger
+      50ms  1.32% 82.63%       50ms  1.32%  internal/runtime/maps.ctrlGroupMatchEmpty (inline)
+      50ms  1.32% 83.95%       50ms  1.32%  runtime.procPin (inline)
+      50ms  1.32% 85.26%      480ms 12.63%  runtime.slicebytetostring
+      40ms  1.05% 86.32%      140ms  3.68%  fmt.(*buffer).write (inline)

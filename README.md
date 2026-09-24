@@ -77,9 +77,28 @@ Les outils optionnels manquants produisent un avertissement et une étape
 ignorée, jamais un échec :
 
 ```bash
-winget install sharkdp.hyperfine
+brew install hyperfine
 go install golang.org/x/perf/cmd/benchstat@latest
-winget install Graphviz.Graphviz
+brew install graphviz
+```
+
+### Commandes citées dans `docs/report/auditfinal.md`
+
+Reproduction des mesures du rapport de synthèse, dans l'ordre où il les cite.
+
+```bash
+# Parallélisation et mémoire, scénario large (Optimisations n°3/n°4, Annexe)
+hyperfine --warmup 3 --runs 10 -L e flatgrid,parallel,nogc -L p 1,4,12 \
+    "./bin/antsim.exe -quiet -config internal/config/scenarios/large.json -engine {e} -gomaxprocs {p}"
+
+# Allocations avant/après la correction de la fuite mémoire (Optimisation n°4)
+./bin/antsim.exe -quiet -config internal/config/scenarios/large.json -engine parallel -ticks 300 | grep allocs
+./bin/antsim.exe -quiet -config internal/config/scenarios/large.json -engine nogc -ticks 300 | grep allocs
+
+# Mémoire du processus échantillonnée pendant une exécution longue (graphique memleak.png)
+./bin/antsim.exe -quiet -config internal/config/scenarios/large.json -engine {parallel,nogc} -ticks 60000 -gomaxprocs 12 &
+# puis, en boucle toutes les 0,25 s jusqu'à la fin du process :
+ps -o rss= -p <PID>
 ```
 
 ## État

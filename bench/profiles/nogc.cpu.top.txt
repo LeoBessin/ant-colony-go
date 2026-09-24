@@ -1,0 +1,29 @@
+File: antsim.exe
+Type: cpu
+Time: 2026-09-24 10:35:24 CEST
+Duration: 202.41ms, Total samples = 150ms (74.11%)
+Showing nodes accounting for 150ms, 100% of 150ms total
+      flat  flat%   sum%        cum   cum%
+     100ms 66.67% 66.67%      100ms 66.67%  runtime.pthread_cond_wait
+      40ms 26.67% 93.33%       40ms 26.67%  runtime.pthread_cond_signal
+      10ms  6.67%   100%       10ms  6.67%  runtime.usleep
+         0     0%   100%      110ms 73.33%  runtime.findRunnable
+         0     0%   100%       10ms  6.67%  runtime.lock (inline)
+         0     0%   100%       10ms  6.67%  runtime.lock2
+         0     0%   100%       10ms  6.67%  runtime.lockWithRank (inline)
+         0     0%   100%      100ms 66.67%  runtime.mPark (inline)
+         0     0%   100%      130ms 86.67%  runtime.mcall
+         0     0%   100%      100ms 66.67%  runtime.notesleep
+         0     0%   100%       40ms 26.67%  runtime.notewakeup
+         0     0%   100%       10ms  6.67%  runtime.osyield (inline)
+         0     0%   100%      130ms 86.67%  runtime.park_m
+         0     0%   100%       20ms 13.33%  runtime.ready
+         0     0%   100%       20ms 13.33%  runtime.resetspinning
+         0     0%   100%      130ms 86.67%  runtime.schedule
+         0     0%   100%      100ms 66.67%  runtime.semasleep
+         0     0%   100%       40ms 26.67%  runtime.semawakeup
+         0     0%   100%       20ms 13.33%  runtime.send.goready.func1
+         0     0%   100%       40ms 26.67%  runtime.startm
+         0     0%   100%      100ms 66.67%  runtime.stopm
+         0     0%   100%       20ms 13.33%  runtime.systemstack
+         0     0%   100%       40ms 26.67%  runtime.wakep

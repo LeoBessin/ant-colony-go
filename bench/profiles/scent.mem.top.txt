@@ -1,0 +1,32 @@
+File: antsim.exe
+Type: alloc_objects
+Time: 2026-09-23 19:50:00 CEST
+Showing nodes accounting for 82473, 100% of 82474 total
+Dropped 4 nodes (cum <= 412)
+Showing top 25 nodes out of 26
+      flat  flat%   sum%        cum   cum%
+     65537 79.46% 79.46%      65537 79.46%  antcolony/internal/engine/scent.trailKey
+      9701 11.76% 91.23%      75238 91.23%  antcolony/internal/engine/scent.(*World).commit
+      5461  6.62% 97.85%       5461  6.62%  time.Sleep
+      1774  2.15%   100%       1774  2.15%  runtime.mallocgc
+         0     0%   100%      75238 91.23%  antcolony/internal/engine/scent.(*Engine).Run
+         0     0%   100%      75238 91.23%  antcolony/internal/engine/scent.(*World).tick
+         0     0%   100%      75239 91.23%  main.main
+         0     0%   100%      75239 91.23%  main.run
+         0     0%   100%       1737  2.11%  runtime.allocm
+         0     0%   100%        455  0.55%  runtime.mProfStackInit (inline)
+         0     0%   100%      75239 91.23%  runtime.main
+         0     0%   100%        455  0.55%  runtime.makeProfStackFP (inline)
+         0     0%   100%        455  0.55%  runtime.makeslice
+         0     0%   100%        769  0.93%  runtime.mcall
+         0     0%   100%        455  0.55%  runtime.mcommoninit
+         0     0%   100%        968  1.17%  runtime.mstart
+         0     0%   100%        968  1.17%  runtime.mstart0
+         0     0%   100%        968  1.17%  runtime.mstart1
+         0     0%   100%       1737  2.11%  runtime.newm
+         0     0%   100%       1319  1.60%  runtime.newobject
+         0     0%   100%        769  0.93%  runtime.park_m
+         0     0%   100%       1481  1.80%  runtime.resetspinning
+         0     0%   100%       1737  2.11%  runtime.schedule
+         0     0%   100%       1737  2.11%  runtime.startm
+         0     0%   100%       1737  2.11%  runtime.wakep

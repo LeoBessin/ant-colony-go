@@ -1,0 +1,32 @@
+File: antsim.exe
+Type: cpu
+Time: 2026-09-24 10:35:24 CEST
+Duration: 202.30ms, Total samples = 230ms (113.69%)
+Showing nodes accounting for 230ms, 100% of 230ms total
+Showing top 25 nodes out of 48
+      flat  flat%   sum%        cum   cum%
+      70ms 30.43% 30.43%       70ms 30.43%  runtime.pthread_cond_signal
+      60ms 26.09% 56.52%       60ms 26.09%  runtime.pthread_cond_wait
+      40ms 17.39% 73.91%       40ms 17.39%  runtime.madvise
+      30ms 13.04% 86.96%       30ms 13.04%  runtime.usleep
+      20ms  8.70% 95.65%       20ms  8.70%  runtime.pthread_kill
+      10ms  4.35%   100%       10ms  4.35%  runtime.arenaIndex (inline)
+         0     0%   100%       20ms  8.70%  runtime.(*gcControllerState).enlistWorker
+         0     0%   100%       10ms  4.35%  runtime.(*gcWork).balance
+         0     0%   100%       30ms 13.04%  runtime.(*mheap).alloc.func1
+         0     0%   100%       10ms  4.35%  runtime.(*mheap).allocManual
+         0     0%   100%       40ms 17.39%  runtime.(*mheap).allocSpan
+         0     0%   100%       90ms 39.13%  runtime.findRunnable
+         0     0%   100%       10ms  4.35%  runtime.gcBgMarkWorker
+         0     0%   100%       40ms 17.39%  runtime.gcBgMarkWorker.func2
+         0     0%   100%       40ms 17.39%  runtime.gcDrain
+         0     0%   100%       20ms  8.70%  runtime.gcDrainMarkWorkerDedicated (inline)
+         0     0%   100%       20ms  8.70%  runtime.gcDrainMarkWorkerIdle (inline)
+         0     0%   100%       10ms  4.35%  runtime.getempty
+         0     0%   100%       10ms  4.35%  runtime.getempty.func1
+         0     0%   100%       10ms  4.35%  runtime.handoff
+         0     0%   100%       10ms  4.35%  runtime.heapArenaOf (inline)
+         0     0%   100%       30ms 13.04%  runtime.lock (inline)
+         0     0%   100%       30ms 13.04%  runtime.lock2
+         0     0%   100%       30ms 13.04%  runtime.lockWithRank (inline)
+         0     0%   100%       60ms 26.09%  runtime.mPark (inline)
