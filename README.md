@@ -102,7 +102,9 @@ Image multi-étage (`golang:1.26-alpine` → `distroless/static:nonroot`,
   sur SIGTERM (flux SSE fermés, benchs annulés).
 
 Exposé sur un serveur, le harnais est **borné** pour ne pas épuiser l'hôte :
-grille ≤ 256×256, ≤ 5000 fourmis, ≤ 5000 ticks, `repeat` ≤ 5, corps de requête
+grille ≤ 256×256, ≤ 5000 fourmis, ≤ 5000 ticks, fourmis × ticks ≤ 2 M (tous
+les moteurs avant `nogc` gardent `Ant.Trail`, la fuite de l'optimisation n°4 :
+~39 o par fourmi et par tick), `repeat` ≤ 5, corps de requête
 ≤ 1 Mo, un seul bench à la fois (les autres reçoivent `429`), bench coupé à
 60 s, exécution en direct coupée à 5 min (`internal/uiserver/limits.go`). Le
 conteneur est en plus plafonné à 2 cœurs et 512 Mo (`docker-compose.yml`).

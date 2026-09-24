@@ -103,6 +103,8 @@ func TestLimitsRejectOversizedRequests(t *testing.T) {
 		{"huge ants", "/api/run", `{"scenario":"tiny","engine":"naive","ants":1000000}`, "server limit"},
 		{"huge grid", "/api/run", `{"engine":"naive","config":{"version":1,"width":100000,"height":100000,"ticks":1,"ant_count":1,"nest":{"x":0,"y":0},"pheromone":{"evap_den":1,"diff_den":1,"max":1},"movement":{"random_den":1}}}`, "server limit"},
 		{"overflowing grid", "/api/run", `{"engine":"naive","config":{"version":1,"width":4294967296,"height":4294967296,"ticks":1,"ant_count":1,"nest":{"x":0,"y":0},"pheromone":{"evap_den":1,"diff_den":1,"max":1},"movement":{"random_den":1}}}`, "server limit"},
+		{"ant-tick budget", "/api/run", `{"scenario":"large","engine":"parallel","ants":2000,"ticks":5000}`, "ant_count x ticks"},
+		{"ant-tick budget bench", "/api/bench", `{"scenario":"large","engines":["parallel"],"ticks":5000}`, "ant_count x ticks"},
 		{"huge repeat", "/api/bench", `{"scenario":"tiny","engines":["naive"],"repeat":1000}`, "server limit"},
 		{"huge bench ticks", "/api/bench", `{"scenario":"tiny","engines":["naive"],"ticks":1000000000}`, "server limit"},
 		{"oversized body", "/api/run", `{"scenario":"tiny","engine":"naive","pad":"` + strings.Repeat("x", maxBodyBytes) + `"}`, "too large"},
