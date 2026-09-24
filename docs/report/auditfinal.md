@@ -13,6 +13,16 @@
 
 ---
 
+## Diagnostic
+
+Avant toute mesure, le simple usage du programme suffisait à repérer le problème :
+
+- Le module principal était perceptiblement lent à l'exécution, là où le calcul demandé par tick est trivial.
+- Un seul cœur travaillait, visible dans le moniteur d'activité, alors que la machine en propose douze.
+- Sur une exécution longue, la mémoire du processus grossissait à vue d'œil, sans jamais se stabiliser.
+
+---
+
 ## Résultats — les chiffres
 
 ### Optimisation n°1 — Adressage de la grille
@@ -57,47 +67,24 @@ Sur 60 000 cycles (`large`) : 26 Mo → **4,4 Go** en moins de 19 s avant correc
 
 ---
 
-## Interprétation des résultats
+## Analyse — cause racine et résolution
 
-- **Le gain vient d'arrêter de gâcher des ressources, pas d'en ajouter.** La correction n°1 (algorithmique, zéro ressource ajoutée) fait ×93,8 à elle seule. Les corrections n°2 et n°3, qui ajoutent des cœurs puis suppriment un gaspillage mémoire, n'apportent « que » ×1,5 et ×1,7 — et seulement une fois n°1 en place. Paralléliser la version d'origine telle quelle n'a pas été testé, mais son profil ne suggère rien de mieux : le même goulot (la `map`) domine quel que soit le nombre de cœurs.
-- **Le gain se multiplie, il ne s'additionne pas.** ×242 = 93,8 × 1,5 × 1,72, pas leur somme. Chaque correction s'applique à un programme déjà plus rapide, donc son effet relatif grandit.
-- **Les trois corrections n'ont pas la même nature.** Les deux premières se lisent sur un chronomètre. La troisième (fuite mémoire) a un gain de vitesse modeste (×1,7) ; sa vraie valeur est la **stabilité** — sans elle, une exécution longue épuise la mémoire disponible et provoque un arrêt, indépendamment de la vitesse. Seul le suivi dans le temps (graphique de l'optimisation n°3, plus bas) la révèle.
+### Optimisation n°1 — Adressage de la grille
 
----
+**Symptôme** : le module principal met 4,10 s pour un scénario `medium` qui ne devrait prendre que quelques millisecondes — le temps explose avec la taille de la grille alors que la logique de simulation par tick est triviale. Même symptôme sur le module « recherche de nourriture », construit après coup et jamais corrigé.
 
-## Diagnostic
-
-**Outil** : `pprof`, le profileur intégré à Go — il échantillonne le programme en cours d'exécution des milliers de fois par seconde et note la ligne active à chaque fois. Résultat : un classement des fonctions par temps réellement consommé, mesuré, pas estimé.
-
-La grille (murs, nourriture, traces chimiques) était stockée dans des `map`. Lire une case exigeait de construire une clé texte (ex. `"42,17"`) via `fmt.Sprintf`, puis de chercher cette clé dans la `map`. `pprof` chiffre ce coût : **76 % du temps CPU total**, plus que toute la logique de déplacement réunie. Ligne par ligne (`pprof -list`) : la construction de la clé (`naive.go:105`) consomme **55,6 %** à elle seule ; la recherche dans la `map` en ajoute **20,8 %**.
+**Cause racine** : `pprof` (profileur CPU intégré à Go, échantillonnage en cours d'exécution réelle) chiffre le coût. La grille (murs, nourriture, traces chimiques) est stockée dans des `map` : chaque lecture de case construit d'abord une clé texte (`fmt.Sprintf`, ex. `"42,17"`) avant la recherche. **76 % du temps CPU total** y passe — ligne par ligne (`pprof -list`) : 55,6 % pour la construction de clé (`naive.go:105`), 20,8 % pour la recherche `map`.
 
 > ## 76 %
 > du temps CPU total consommé par la construction de clé texte et la recherche `map`.
 
 ![Arbre d'appel : la conversion en texte et la recherche dans la map dominent visuellement la largeur du graphique](img/flamegraph.png)
 
-La tour verte (gauche) est la chaîne de construction de clé (`naive.key` → `fmt.Sprintf`) — plus de la moitié de la largeur du graphique à elle seule. Les blocs roses (droite) sont la recherche `map` et le nettoyage mémoire qu'elle déclenche. La logique utile de la simulation est trop étroite pour être visible à cette échelle.
+Confirmation par chronométrage isolé (`benchstat`) : lire une case par `map` coûte 52,96 ns, par index direct 0,313 ns — **169× plus lent**, hors de toute simulation. Trois mesures indépendantes (pourcentage `pprof`, arbre d'appel, chronométrage isolé) pointent la même cause.
 
-**Confirmation par chronométrage isolé** (`go test -bench` + `benchstat`) : lire une case par `map` contre lire la même case par calcul d'index direct.
+**Résolution** : suppression de la clé texte et remplacement de chaque `map` de la grille par un tableau adressé par calcul d'index direct, sur les deux modules. Aucune autre logique changée — même ordre de traitement, mêmes règles, même hasard contrôlé. La vérification par compteurs matériels (`time -l`), indépendante de `pprof`, révèle en plus qu'avant correction un second cœur travaillait en tâche de fond (nettoyage mémoire automatique) : le temps CPU consommé (4,25 s) dépassait le temps réel écoulé (3,94 s).
 
-| Méthode de lecture d'une case | Temps par lecture |
-|---|---:|
-| Par `map` (clé texte) | 52,96 ns |
-| Par index direct | **0,313 ns** |
-
-**169× plus lent**, hors de toute simulation. Trois mesures indépendantes (pourcentage `pprof`, arbre d'appel, chronométrage isolé) pointent la même cause — c'est ce diagnostic qui a guidé la correction n°1.
-
----
-
-## Explications — comment et pourquoi
-
-### Optimisation n°1 — Adressage de la grille
-
-Deux modules partageaient le même problème : le module principal, et le module « recherche de nourriture » (permet à une fourmi de sentir un tas de nourriture à proximité), construit avant cette correction et n'en ayant donc pas bénéficié. Même cause, même correction appliquée aux deux.
-
-**Changement** : suppression de la clé texte (`fmt.Sprintf`), remplacement de chaque `map` de la grille par un tableau simple adressé par calcul d'index direct. Aucune autre logique modifiée — même ordre de traitement, mêmes règles, même hasard contrôlé. Résultat : opérations mémoire divisées par plus de 400 sur les deux modules.
-
-La vérification par compteurs matériels (`time -l`) confirme le gain par une voie indépendante de `pprof`. Elle révèle un point notable : avant correction, le temps CPU consommé (4,25 s) dépassait le temps réel écoulé (3,94 s) — le nettoyage mémoire automatique de Go tournait en tâche de fond sur un second cœur, à cause du volume d'opérations mémoire. Après correction, ce second cœur n'est plus sollicité.
+**Conclusion** : opérations mémoire divisées par plus de 400 sur les deux modules ; ×93,8 sur le temps d'exécution du module principal (détail chiffré en Résultats).
 
 ![Temps d'exécution avant / après, échelle logarithmique](img/results.png)
 
@@ -105,21 +92,25 @@ La vérification par compteurs matériels (`time -l`) confirme le gain par une v
 
 ### Optimisation n°2 — Parallélisation multi-cœurs
 
-Après les deux premières corrections, le programme restait mono-cœur sur une machine qui en propose douze.
+**Symptôme** : après la correction n°1, le programme reste mono-cœur sur une machine qui en propose douze.
 
-**Changement** : un groupe fixe de *workers* (jusqu'à 12) démarre une fois au lancement et se réutilise à chaque cycle. Le travail parallélisable (réflexion des fourmis, évolution des traces chimiques) leur est réparti. Une étape reste série à dessein : le dépôt effectif sur le plateau (ramassage, retour au nid, marquage chimique) doit se faire fourmi par fourmi pour trancher les conflits — c'est le **chemin critique** identifié au diagnostic, seule partie non parallélisable.
+**Cause racine** : aucun découpage du travail entre cœurs. Une partie du tick est parallélisable (réflexion des fourmis, évolution des traces chimiques) ; une autre doit rester série — le dépôt effectif sur le plateau (ramassage, retour au nid, marquage chimique), fourmi par fourmi, pour trancher les conflits. C'est le **chemin critique** : la partie non parallélisable borne le gain, quel que soit le nombre de cœurs ajoutés.
 
-Douze cœurs ne donnent pas douze fois plus vite, seulement ×1,6 : au-delà d'un certain nombre de cœurs, c'est le chemin critique, pas le calcul, qui borne le temps.
+**Résolution** : un groupe fixe de *workers* (jusqu'à 12) démarre une fois au lancement et se réutilise à chaque cycle ; le travail parallélisable leur est réparti, le dépôt reste série.
+
+**Conclusion** : douze cœurs ne donnent pas douze fois plus vite, seulement ×1,6 — au-delà d'un certain nombre de cœurs, c'est le chemin critique, pas le calcul, qui borne le temps.
 
 ![Temps d'exécution selon le nombre de cœurs utilisés](img/scaling.png)
 
 ### Optimisation n°3 — Résolution d'une fuite de mémoire
 
-Sur une exécution longue, la mémoire occupée augmentait en continu sans jamais se stabiliser.
+**Symptôme** : sur une exécution longue, la mémoire occupée augmente en continu sans jamais se stabiliser — 26 Mo à **4,4 Go** en moins de 19 s (60 000 cycles, scénario `large`).
 
-**Cause** : chaque fourmi conservait l'historique complet des cases visitées depuis le début, dans une liste qui ne fait que grandir — ajoutée à une étape antérieure du projet, jamais relue, jamais nettoyée.
+**Cause racine** : chaque fourmi conserve l'historique complet des cases visitées depuis le début, dans une liste qui ne fait que grandir — ajoutée à une étape antérieure du projet, jamais relue, jamais nettoyée.
 
-**Changement** : suppression de cette liste. Rien d'autre modifié. Effet secondaire favorable : cette liste alimentait le chemin critique (étape série de l'optimisation n°2), qui devient lui-même plus court. Résultat à 12 cœurs : **50,6 ms**, contre 87 ms précédemment et 134 ms au départ — ×1,7 supplémentaire, ×2,7 depuis le tout premier module.
+**Résolution** : suppression de cette liste. Rien d'autre modifié.
+
+**Conclusion** : mémoire stable à 8 Mo du début à la fin. Effet secondaire favorable : cette liste alimentait aussi le chemin critique de l'optimisation n°2, qui devient plus court — 50,6 ms contre 87 ms précédemment, ×1,7 supplémentaire, ×2,7 depuis le tout premier module.
 
 ![Mémoire occupée pendant une exécution longue, avant et après correction](img/memleak.png)
 
@@ -129,12 +120,24 @@ Sur une exécution longue, la mémoire occupée augmentait en continu sans jamai
 
 | Outil | Rôle | Ce qu'il a montré ici |
 |---|---|---|
-| `pprof` | Profilage CPU/mémoire réel, ligne de code exacte. | Cible à corriger : `naive.key` + la `map`, 76 % du CPU (Diagnostic). |
+| `pprof` | Profilage CPU/mémoire réel, ligne de code exacte. | Cible à corriger : `naive.key` + la `map`, 76 % du CPU (Analyse). |
 | `go test -bench` + `benchstat` | Micro-mesures moyennées sur ≥6 exécutions. | Chiffrage avant/après par module (Résultats, Annexe). |
 | `hyperfine` | Temps du binaire complet, 10 exécutions, chauffe incluse. | Confirme l'ordre de grandeur de `benchstat` par une mesure indépendante. |
 | `time -l` (compteurs matériels) | Instructions/cycles CPU, mémoire réelle — indépendant de l'outillage Go. | Confirme le gain une 3ᵉ fois ; a révélé un second cœur actif en tâche de fond avant correction (n°1). |
 | Tests de non-régression (`go test`) | Comparaison bit à bit du résultat produit, avant/après. | Les quatre corrections passent ; `-race` en plus pour n°2/n°3 : aucune donnée partagée entre workers. |
 | Échantillonnage RSS (`ps`, 1×/s) | Mémoire réellement occupée pendant l'exécution, seconde par seconde. | Graphique de fuite mémoire (n°3) : croissance continue avant, ligne plate après. |
+
+---
+
+## Interprétation des résultats — conclusion
+
+**Observation** : le tableau cumulatif de Résultats affiche ×242 sur le temps total, mais cette valeur unique cache trois contributions très inégales (×93,8, ×1,50, ×1,72) — la lecture qui suit explique pourquoi cet écart n'est pas un hasard.
+
+| Constat | Lecture |
+|---|---|
+| **Le gain vient d'arrêter de gâcher des ressources, pas d'en ajouter.** | La correction n°1 (algorithmique, zéro ressource ajoutée) fait ×93,8 à elle seule. Les corrections n°2 et n°3, qui ajoutent des cœurs puis suppriment un gaspillage mémoire, n'apportent « que » ×1,5 et ×1,7 — et seulement une fois n°1 en place. Paralléliser la version d'origine telle quelle n'a pas été testé, mais son profil ne suggère rien de mieux : le même goulot (la `map`) domine quel que soit le nombre de cœurs. |
+| **Le gain se multiplie, il ne s'additionne pas.** | ×242 = 93,8 × 1,5 × 1,72, pas leur somme. Chaque correction s'applique à un programme déjà plus rapide, donc son effet relatif grandit. |
+| **Les trois corrections n'ont pas la même nature.** | Les deux premières se lisent sur un chronomètre. La troisième (fuite mémoire) a un gain de vitesse modeste (×1,7) ; sa vraie valeur est la **stabilité** — sans elle, une exécution longue épuise la mémoire disponible et provoque un arrêt, indépendamment de la vitesse. Seul le suivi dans le temps (graphique de l'optimisation n°3) la révèle. |
 
 ---
 
@@ -165,3 +168,14 @@ Sur une exécution longue, la mémoire occupée augmentait en continu sans jamai
 | scent | 45,8 ms | ± 0,5 ms | ×1,08 |
 | gradient | 4,007 s | ± 0,148 s | ×94,9 |
 | naive | 4,214 s | ± 0,020 s | ×99,8 |
+
+### Disponibilité sous charge HTTP réelle (`vegeta`, harnais web `antweb`)
+
+| Environnement | Disponibilité | Débit effectif | Latence p50 | Latence p99 |
+|---|---|---:|---:|---:|
+| Déployé (`ant-go.leo-bessin.dev`, internet + proxy) | 100,00 % (0 erreur) | 49,97 req/s | 30,8 ms | **74,8 ms** |
+| Local (`localhost:8080`, direct, même charge) | 100,00 % (0 erreur) | — | 0,69 ms | **1,16 ms** |
+
+Même charge (`vegeta`, 50 req/s, 30 s, `GET /`), même code — seul l'environnement réseau change. En local, aucun trajet internet ni proxy : l'écart (**×64** sur le p99) mesure donc le coût du réseau et du proxy de déploiement, pas celui de l'application.
+
+_Mesure indicative (un seul run, sans warmup) — protocole moins rigoureux que `hyperfine`/`benchstat` (voir Méthode). Porte sur le harnais web, pas sur le moteur de simulation mesuré par ailleurs dans ce document._
