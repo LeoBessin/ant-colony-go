@@ -28,9 +28,9 @@ Extrait de `docs/bareme-evaluation-performance-for-backend.pdf` :
 > tant que tel **n'est pas noté**. Seul le document final (Rapport d'Audit) fait
 > foi pour la notation.
 
-Le livrable est **`docs/report/audit.md`**, un rapport d'audit de performance en
-français, noté sur 20 points + 2 bonus. Le code existe pour rendre ses mesures
-vraies et reproductibles.
+Le livrable est **`docs/report/auditfinal.md`**, un rapport d'audit de
+performance en français, noté sur 20 points + 2 bonus. Le code existe pour
+rendre ses mesures vraies et reproductibles.
 
 | § | Points | Exigence |
 |---|---|---|
@@ -226,7 +226,7 @@ deadline :**
 
 Chaque étage, retenu ou optionnel, suit exactement la procédure §5 (profiler
 d'abord, un seul changement, `make test` avant de publier un chiffre) et le
-gabarit de rédaction en tête de `docs/report/audit.md` §3.
+gabarit des entrées existantes de `docs/journal/`.
 
 ---
 

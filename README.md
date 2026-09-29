@@ -58,6 +58,10 @@ en vérifiant qu'ils produisent toujours le même checksum.
 | `internal/simcore` | contrats : `Engine`, `Result`, `Snapshot`, `Observer`, PRNG |
 | `internal/config` | données d'entrée, scénarios, validation |
 | `internal/engine/naive` | baseline v0 — lente à dessein |
+| `internal/engine/flatgrid` | v1 — grille en tableau indexé (adressage) |
+| `internal/engine/parallel` | v4 — worker pool sur `GOMAXPROCS` (concurrence) |
+| `internal/engine/nogc` | v3 — suppression de `Ant.Trail` (zéro allocation) |
+| `internal/engine/gradient`, `.../scent` | variantes sémantiques, golden séparé (voir §9 de `CLAUDE.md`) |
 | `test/` | tests golden de déterminisme |
 | `bench/` | suites `testing.B`, résultats et profils |
 | `docs/report/` | **le livrable noté** |
@@ -120,11 +124,16 @@ Les chiffres affichés par l'UI conteneurisée sont **indicatifs** : les mesures
 du rapport viennent de `cmd/antsim` sous hyperfine. Les scénarios étant
 embarqués (`go:embed`), en modifier un impose de relancer avec `--build`.
 
-### Commandes citées dans `docs/report/auditfinal.md`
+### Commandes hors `run_benchmarks.sh`, citées dans les rapports
 
-Reproduction des mesures du rapport de synthèse, dans l'ordre où il les cite.
+`make all` couvre `test`/`bench`/`hyper`/`profile`. Ce qui suit ne l'est
+pas — lancé à la main pour `docs/report/auditfinal.md`.
 
 ```bash
+# Compteurs matériels du processeur (Optimisation n°1, vérification indépendante de pprof)
+/usr/bin/time -l ./bin/antsim.exe -quiet -config internal/config/scenarios/medium.json -engine naive
+/usr/bin/time -l ./bin/antsim.exe -quiet -config internal/config/scenarios/medium.json -engine flatgrid
+
 # Parallélisation et mémoire, scénario large (Optimisations n°3/n°4, Annexe)
 hyperfine --warmup 3 --runs 10 -L e flatgrid,parallel,nogc -L p 1,4,12 \
     "./bin/antsim.exe -quiet -config internal/config/scenarios/large.json -engine {e} -gomaxprocs {p}"
@@ -137,18 +146,20 @@ hyperfine --warmup 3 --runs 10 -L e flatgrid,parallel,nogc -L p 1,4,12 \
 ./bin/antsim.exe -quiet -config internal/config/scenarios/large.json -engine {parallel,nogc} -ticks 60000 -gomaxprocs 12 &
 # puis, en boucle toutes les 0,25 s jusqu'à la fin du process :
 ps -o rss= -p <PID>
+
+# Disponibilité/latence sous charge HTTP réelle (Annexe) — nécessite `antweb` lancé (make web) et vegeta installé
+echo "GET http://localhost:8080/" | vegeta attack -rate=50 -duration=30s -timeout=10s | vegeta report
 ```
 
 ## État
 
-Seule la **baseline v0** existe. Les étages suivants (grille plate, disposition
-SoA, zéro allocation, worker pool, codecs binaires, et une régression de faux
-partage volontaire) sont planifiés dans `CLAUDE.md` et seront construits
-profilage en main — la règle du cours est *on ne devine jamais le Hot Path, on
-le mesure*.
+Construits et mesurés : `naive` (baseline), `flatgrid` (v1, adressage),
+`parallel` (v4, concurrence), `nogc` (v3, zéro allocation), `gradient` et
+`scent` (variantes).
 
-Hot Path v0 mesuré : `fmt.Sprintf` à **61,9 %** du CPU cumulé et **99,9 %** des
-allocations. Voir `docs/journal/01-profiling.md`.
+Hot Path v0 mesuré : `naive.go:105` (`fmt.Sprintf`) à **76 %** du temps CPU
+total (construction de clé + recherche `map`). Voir `docs/report/auditfinal.md`
+(« Analyse — cause racine et résolution ») et `docs/journal/01-profiling.md`.
 
 ## Règles de contribution
 

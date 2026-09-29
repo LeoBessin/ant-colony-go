@@ -2,8 +2,7 @@
 
 | Chemin | Contenu |
 |---|---|
-| `report/audit.md` | **Le livrable note** — rapport d'audit de performance |
-| `report/generated-tables.md` | Tableaux generes par `make report` (ne pas editer a la main) |
+| `report/auditfinal.md` | **Le livrable note** — rapport d'audit de performance |
 | `journal/` | Journal d'optimisation, une entree par seance |
 | `env/` | Specifications du banc d'essai capturees par `make env` |
 
