@@ -15,6 +15,7 @@ Nécessite Go 1.23+ (développé et mesuré sur 1.27.1).
 
 ```bash
 go run ./cmd/antweb            # interface du harnais sur http://localhost:8080
+go run ./cmd/antweb -unlimited # idem, sans plafonds (local uniquement, voir « Mode limité et mode illimité »)
 ```
 
 ```bash
@@ -105,13 +106,52 @@ Image multi-étage (`golang:1.26-alpine` → `distroless/static:nonroot`,
 - Délais de lecture/écriture, `/healthz` pour le healthcheck, et arrêt propre
   sur SIGTERM (flux SSE fermés, benchs annulés).
 
-Exposé sur un serveur, le harnais est **borné** pour ne pas épuiser l'hôte :
-grille ≤ 256×256, ≤ 5000 fourmis, ≤ 5000 ticks, fourmis × ticks ≤ 2 M (tous
-les moteurs avant `nogc` gardent `Ant.Trail`, la fuite de l'optimisation n°4 :
-~39 o par fourmi et par tick), `repeat` ≤ 5, corps de requête
-≤ 1 Mo, un seul bench à la fois (les autres reçoivent `429`), bench coupé à
-60 s, exécution en direct coupée à 5 min (`internal/uiserver/limits.go`). Le
-conteneur est en plus plafonné à 2 cœurs et 512 Mo (`docker-compose.yml`).
+#### Mode limité (par défaut) et mode illimité
+
+`antweb` démarre en **mode limité** : c'est le mode d'un harnais exposé, borné
+pour qu'une seule requête ne puisse pas épuiser l'hôte (OOM du conteneur, cœur
+bloqué indéfiniment). Les plafonds sont définis dans
+`internal/uiserver/limits.go` et appliqués à `/api/run` comme à `/api/bench` :
+
+| Plafond | Valeur | Pourquoi |
+|---|---|---|
+| Cellules de la grille | ≤ 256 × 256 (65 536) | deux grilles par moteur + 256 snapshots en tampon (~34 Mo) |
+| Fourmis | ≤ 5000 | |
+| Ticks | ≤ 5000 | |
+| Fourmis × ticks | ≤ 2 000 000 | les moteurs avant `nogc` gardent `Ant.Trail` (fuite de l'optimisation n°4, ~39 o par fourmi et par tick) : ~80 Mo au pire |
+| Murs + tas de nourriture | ≤ 4096 | `naive` les parcourt à chaque tick |
+| `repeat` d'un bench | ≤ 5 | |
+| Benchs simultanés | 1 | les suivants reçoivent `429` : `parallel` occupe déjà tous les cœurs |
+| Durée d'un bench | 60 s | |
+| Durée d'une exécution en direct | 5 min | arrêt même sans clic sur *Stop* |
+
+Tous les plafonds sont nettement au-dessus du plus grand scénario embarqué
+(`large` : 256×256, 2000 fourmis, 300 ticks) : l'UI ne refuse jamais ses propres
+scénarios. Une requête qui dépasse un plafond reçoit `400` avec le plafond en
+cause dans le message. Le conteneur est en plus plafonné à 2 cœurs et 512 Mo
+(`docker-compose.yml`, avec `GOMEMLIMIT=400MiB`).
+
+Le **mode illimité** lève tous ces plafonds, la sérialisation des benchs et les
+deux délais, pour qu'un test de charge local (vegeta, hey) mesure les moteurs et
+non les refus du serveur :
+
+```bash
+make web-unlimited             # équivaut à : go run ./cmd/antweb -unlimited
+```
+
+Garde-fous :
+
+- **Loopback uniquement.** `-unlimited` n'est accepté qu'avec une adresse
+  d'écoute locale (`localhost:…`, `127.0.0.1:…`, `[::1]:…`). Toute autre adresse,
+  y compris `:8080` (toutes les interfaces), fait sortir `antweb` avec le code 2.
+  Le conteneur, qui écoute sur `:8080`, ne peut donc pas tourner en mode
+  illimité.
+- `antweb` affiche `WARNING: limits disabled (-unlimited)` au démarrage.
+- Le corps de requête reste limité à 1 Mo dans les deux modes.
+
+`cmd/antsim`, la cible de mesure, n'a aucun de ces plafonds : ils ne concernent
+que le serveur web. Seul `config.Validate` s'y applique, et il ne rejette que
+les configurations incohérentes, sans borne supérieure.
 
 En déploiement, le harnais est protégé par une authentification HTTP Basic
 appliquée par `antweb` lui-même (quel que soit le proxy devant, et sur tous les
