@@ -214,3 +214,4 @@ ne jamais régénérer les fichiers golden pour faire passer un test en échec.
 > **Note sur la langue.** La documentation et le rapport sont en français ; le
 > code, les commentaires et les identifiants sont en anglais, comme il est
 > d'usage en Go.
+
